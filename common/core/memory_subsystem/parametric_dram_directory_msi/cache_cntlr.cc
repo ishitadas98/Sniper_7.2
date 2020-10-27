@@ -33,11 +33,16 @@ static UInt64 g_costSTTRAM;
 
 static UInt64 g_NumberL2WritebacksToL3;
 
+
 /* If the flag is true, it indicates that a block from LLC is getting evicted.
  * In such a case, there is not need account for write to LLC (LLC being STTRAM)
  */
 //#define WAYS_TO_SRAM    4
-#define WAYS_TO_SRAM    4
+#define WAYS_TO_SRAM    16
+
+static UInt64 block_write[8] = {0};
+static UInt64 block_read[8] = {0};
+UInt32 block_offset;
 
 // Define to allow private L2 caches not to take the stack lock.
 // Works in most cases, but seems to have some more bugs or race conditions, preventing it from being ready for prime time.
@@ -255,6 +260,12 @@ CacheCntlr::CacheCntlr(MemComponent::component_t mem_component,
 
    registerStatsMetric(name, core_id, "timeSTTRAM", &g_timeSTTRAM);
 
+   for(UInt32 i = 0; i < 8; ++i)
+   {
+      registerStatsMetric(name, core_id, String("numberOfL3WriteAtOffset-")+itostr(i), &block_write[i]);
+      registerStatsMetric(name, core_id, String("numberOfL3ReadAtOffset-")+itostr(i), &block_read[i]);
+   }
+
    registerStatsMetric(name, core_id, "loads", &stats.loads);
    registerStatsMetric(name, core_id, "stores", &stats.stores);
    registerStatsMetric(name, core_id, "load-misses", &stats.load_misses);
@@ -375,6 +386,8 @@ CacheCntlr::processMemOpFromCore(
    //printf("processMemOpFromCore is called and eip is: %" PRIxPTR "\n", eip);  //ssn
    //eip_global_2=eip;
    HitWhere::where_t hit_where = HitWhere::MISS;
+
+   block_offset = offset;
 
    // Protect against concurrent access from sibling SMT threads
    ScopedLock sl_smt(m_master->m_smt_lock);
@@ -808,7 +821,7 @@ void CacheCntlr::accountForWriteLatencyOfLLC(IntPtr address, CacheMasterCntlr* m
     UInt32 blockIndex = master->m_cache->getBlockIndex(address);
 
     //if index is 0,1,2,3,4 it is SRAM block, else STTRAM block
-    if (blockIndex <= (WAYS_TO_SRAM - 1))
+    /*if (blockIndex <= (WAYS_TO_SRAM - 1))
     {
         getMemoryManager()->incrElapsedTime(m_mem_component,
                                             CachePerfModel::ACCESS_CACHE_DATA_AND_TAGS,
@@ -817,6 +830,18 @@ void CacheCntlr::accountForWriteLatencyOfLLC(IntPtr address, CacheMasterCntlr* m
     else if (blockIndex > (WAYS_TO_SRAM - 1))
     {
         getMemoryManager()->incrElapsedTime(m_mem_component,
+                                            CachePerfModel::ACCESS_CACHE_WRITEDATA_AND_TAGS,
+                                            ShmemPerfModel::_USER_THREAD);
+    }*/
+    if(block_offset == 0)
+    {
+    	getMemoryManager()->incrElapsedTime(m_mem_component,
+                                            CachePerfModel::ACCESS_CACHE_DATA_AND_TAGS,
+                                            ShmemPerfModel::_USER_THREAD);
+    }
+    else
+    {
+    	getMemoryManager()->incrElapsedTime(m_mem_component,
                                             CachePerfModel::ACCESS_CACHE_WRITEDATA_AND_TAGS,
                                             ShmemPerfModel::_USER_THREAD);
     }
@@ -1428,11 +1453,19 @@ CacheCntlr::accessCache(
    {
       case Core::READ:
       case Core::READ_EX:
+         if(m_mem_component == MemComponent::L3_CACHE)
+         {
+            block_read[block_offset]++;
+         }
          m_master->m_cache->accessSingleLine(ca_address + offset, Cache::LOAD, data_buf, data_length,
                                              getShmemPerfModel()->getElapsedTime(ShmemPerfModel::_USER_THREAD), update_replacement);
          break;
 
       case Core::WRITE:
+         if(m_mem_component == MemComponent::L3_CACHE)
+         {
+            block_write[block_offset]++;
+         }
          m_master->m_cache->accessSingleLine(ca_address + offset, Cache::STORE, data_buf, data_length,
                                              getShmemPerfModel()->getElapsedTime(ShmemPerfModel::_USER_THREAD), update_replacement);
          // Write-through cache - Write the next level cache also
@@ -1503,6 +1536,10 @@ CacheCntlr::invalidateCacheBlock(IntPtr address)
 void
 CacheCntlr::retrieveCacheBlock(IntPtr address, Byte* data_buf, ShmemPerfModel::Thread_t thread_num, bool update_replacement)
 {
+   if(m_mem_component == MemComponent::L3_CACHE)
+         {
+            block_read[block_offset]++;
+         }
    __attribute__((unused)) SharedCacheBlockInfo* cache_block_info = (SharedCacheBlockInfo*) m_master->m_cache->accessSingleLine(
       address, Cache::LOAD, data_buf, getCacheBlockSize(), getShmemPerfModel()->getElapsedTime(thread_num), update_replacement);
    LOG_ASSERT_ERROR(cache_block_info != NULL, "Expected block to be there but it wasn't");
@@ -1531,6 +1568,8 @@ MYLOG("insertCacheBlock l%d @ %lx as %c (now %c)", m_mem_component, address, CSt
                              CachePerfModel::ACCESS_CACHE_WRITEDATA_AND_TAGS);
         g_costSTTRAM = std::stoi(itostr(cost).c_str());
         g_timeSTTRAM += g_costSTTRAM;
+        if(m_mem_component == MemComponent::L3_CACHE)
+         block_write[block_offset]++;
    }
 
    m_master->m_cache->insertSingleLine(address, data_buf,
@@ -1958,6 +1997,10 @@ CacheCntlr::writeCacheBlock(IntPtr address, UInt32 offset, Byte* data_buf, UInt3
    } 
    else 
    {
+      if(m_mem_component == MemComponent::L3_CACHE)
+      {
+         block_write[block_offset]++;
+      }
       __attribute__((unused)) SharedCacheBlockInfo* cache_block_info = (SharedCacheBlockInfo*) m_master->m_cache->accessSingleLine(
          address + offset, Cache::STORE, data_buf, data_length, getShmemPerfModel()->getElapsedTime(thread_num), false);
       LOG_ASSERT_ERROR(cache_block_info, "writethrough expected a hit at next-level cache but got miss");
