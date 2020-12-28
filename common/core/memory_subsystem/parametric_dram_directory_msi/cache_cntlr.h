@@ -17,6 +17,7 @@
 #include "stats.h"
 #include "subsecond_time.h"
 #include "shmem_perf.h"
+#include "cache_perf_model.h"
 
 #include "boost/tuple/tuple.hpp"
 

@@ -24,7 +24,7 @@ CacheSetLRU::~CacheSetLRU()
 UInt32
 CacheSetLRU::getReplacementIndex(CacheCntlr *cntlr)
 {
-   // First try to find an invalid block
+// First try to find an invalid block
    for (UInt32 i = 0; i < m_associativity; i++)
    {
       if (!m_cache_block_info_array[i]->isValid())

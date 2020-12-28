@@ -37,12 +37,14 @@ static UInt64 g_NumberL2WritebacksToL3;
 /* If the flag is true, it indicates that a block from LLC is getting evicted.
  * In such a case, there is not need account for write to LLC (LLC being STTRAM)
  */
-//#define WAYS_TO_SRAM    4
-#define WAYS_TO_SRAM    16
+// #define WAYS_TO_SRAM    4
+// #define WAYS_TO_SRAM    16
+#define WAYS_TO_SRAM    0
 
 static UInt64 block_write[8] = {0};
 static UInt64 block_read[8] = {0};
 UInt32 block_offset;
+//UInt32 writingblock0=0;
 
 // Define to allow private L2 caches not to take the stack lock.
 // Works in most cases, but seems to have some more bugs or race conditions, preventing it from being ready for prime time.
@@ -193,6 +195,7 @@ CacheCntlr::CacheCntlr(MemComponent::component_t mem_component,
        printf("========================\n");
        printf("m_writeback_time:%s\n", itostr(m_writeback_time.getLatency()).c_str());
        printf("m_data_write_time:%s\n", itostr(m_data_write_time.getLatency()).c_str());
+       printf("WAYS_TO_SRAM: %d\n", WAYS_TO_SRAM);
        printf("========================\n");
    }
 
@@ -265,6 +268,7 @@ CacheCntlr::CacheCntlr(MemComponent::component_t mem_component,
       registerStatsMetric(name, core_id, String("numberOfL3WriteAtOffset-")+itostr(i), &block_write[i]);
       registerStatsMetric(name, core_id, String("numberOfL3ReadAtOffset-")+itostr(i), &block_read[i]);
    }
+   //registerStatsMetric(name, core_id, String("WrittenToBlock0-"), &writingblock0);
 
    registerStatsMetric(name, core_id, "loads", &stats.loads);
    registerStatsMetric(name, core_id, "stores", &stats.stores);
@@ -387,7 +391,7 @@ CacheCntlr::processMemOpFromCore(
    //eip_global_2=eip;
    HitWhere::where_t hit_where = HitWhere::MISS;
 
-   block_offset = offset;
+   block_offset = offset/8;
 
    // Protect against concurrent access from sibling SMT threads
    ScopedLock sl_smt(m_master->m_smt_lock);
@@ -820,27 +824,35 @@ void CacheCntlr::accountForWriteLatencyOfLLC(IntPtr address, CacheMasterCntlr* m
 {
     UInt32 blockIndex = master->m_cache->getBlockIndex(address);
 
-    //if index is 0,1,2,3,4 it is SRAM block, else STTRAM block
-    /*if (blockIndex <= (WAYS_TO_SRAM - 1))
+    
+
+    // if index is 0,1,2,3,4 it is SRAM block, else STTRAM block
+   //  if (blockIndex < WAYS_TO_SRAM )
+   //  {
+   //      getMemoryManager()->incrElapsedTime(m_mem_component,
+   //                                          CachePerfModel::ACCESS_CACHE_DATA_AND_TAGS,
+   //                                          ShmemPerfModel::_USER_THREAD);
+   //  }
+   //  else 
+   //  {
+   //      getMemoryManager()->incrElapsedTime(m_mem_component,
+   //                                          CachePerfModel::ACCESS_CACHE_WRITEDATA_AND_TAGS,
+   //                                          ShmemPerfModel::_USER_THREAD);
+   //  }
+
+    // printf("Block offset = %d\n", block_offset);
+    
+    if(block_offset < 1)
     {
-        getMemoryManager()->incrElapsedTime(m_mem_component,
+    	// printf("============Block 0============\n");
+      getMemoryManager()->incrElapsedTime(m_mem_component,
                                             CachePerfModel::ACCESS_CACHE_DATA_AND_TAGS,
                                             ShmemPerfModel::_USER_THREAD);
-    }
-    else if (blockIndex > (WAYS_TO_SRAM - 1))
-    {
-        getMemoryManager()->incrElapsedTime(m_mem_component,
-                                            CachePerfModel::ACCESS_CACHE_WRITEDATA_AND_TAGS,
-                                            ShmemPerfModel::_USER_THREAD);
-    }*/
-    if(block_offset == 0)
-    {
-    	getMemoryManager()->incrElapsedTime(m_mem_component,
-                                            CachePerfModel::ACCESS_CACHE_DATA_AND_TAGS,
-                                            ShmemPerfModel::_USER_THREAD);
+         // writingblock0 = writingblock0+1;
     }
     else
     {
+      // printf("=////////////////Block not 0////////////\n");
     	getMemoryManager()->incrElapsedTime(m_mem_component,
                                             CachePerfModel::ACCESS_CACHE_WRITEDATA_AND_TAGS,
                                             ShmemPerfModel::_USER_THREAD);

@@ -10,7 +10,7 @@ class CachePerfModel
       enum CacheAccess_t
       {
          ACCESS_CACHE_DATA_AND_TAGS = 0,
-	 ACCESS_CACHE_WRITEDATA_AND_TAGS,
+	      ACCESS_CACHE_WRITEDATA_AND_TAGS,
          ACCESS_CACHE_DATA,
          ACCESS_CACHE_TAGS,
          NUM_CACHE_ACCESS_TYPES
