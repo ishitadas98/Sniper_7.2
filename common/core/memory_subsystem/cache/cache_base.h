@@ -72,6 +72,7 @@ class CacheBase
       CacheBase::hash_t m_hash;
       UInt32 m_num_sets;
       AddressHomeLookup *m_ahl;
+      // UInt32 m_LSC[16];
 
       // computed params
       UInt32 m_log_blocksize;

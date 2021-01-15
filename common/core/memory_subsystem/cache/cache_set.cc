@@ -14,7 +14,7 @@
 #include "config.hpp"
 
 CacheSet::CacheSet(CacheBase::cache_t cache_type,
-      UInt32 associativity, UInt32 blocksize):
+      UInt32 associativity, UInt32 blocksize, UInt32 LSC[16]):
       m_associativity(associativity), m_blocksize(blocksize)
 {
    m_cache_block_info_array = new CacheBlockInfo*[m_associativity];
@@ -135,7 +135,7 @@ CacheSet*
 CacheSet::createCacheSet(String cfgname, core_id_t core_id,
       String replacement_policy,
       CacheBase::cache_t cache_type,
-      UInt32 associativity, UInt32 blocksize, CacheSetInfo* set_info)
+      UInt32 associativity, UInt32 blocksize, CacheSetInfo* set_info, UInt32 LSC[16])
 {
    CacheBase::ReplacementPolicy policy = parsePolicyType(replacement_policy);
    switch(policy)
@@ -145,7 +145,7 @@ CacheSet::createCacheSet(String cfgname, core_id_t core_id,
 
       case CacheBase::LRU:
       case CacheBase::LRU_QBS:
-         return new CacheSetLRU(cache_type, associativity, blocksize, dynamic_cast<CacheSetInfoLRU*>(set_info), getNumQBSAttempts(policy, cfgname, core_id));
+         return new CacheSetLRU(cache_type, associativity, blocksize, dynamic_cast<CacheSetInfoLRU*>(set_info), getNumQBSAttempts(policy, cfgname, core_id), LSC);
 
       case CacheBase::NRU:
          return new CacheSetNRU(cache_type, associativity, blocksize);
@@ -176,7 +176,7 @@ CacheSet::createCacheSet(String cfgname, core_id_t core_id,
 }
 
 CacheSetInfo*
-CacheSet::createCacheSetInfo(String name, String cfgname, core_id_t core_id, String replacement_policy, UInt32 associativity)
+CacheSet::createCacheSetInfo(String name, String cfgname, core_id_t core_id, String replacement_policy, UInt32 associativity, UInt32 LSC[16])
 {
    CacheBase::ReplacementPolicy policy = parsePolicyType(replacement_policy);
    switch(policy)
@@ -185,7 +185,7 @@ CacheSet::createCacheSetInfo(String name, String cfgname, core_id_t core_id, Str
       case CacheBase::LRU_QBS:
       case CacheBase::SRRIP:
       case CacheBase::SRRIP_QBS:
-         return new CacheSetInfoLRU(name, cfgname, core_id, associativity, getNumQBSAttempts(policy, cfgname, core_id));
+         return new CacheSetInfoLRU(name, cfgname, core_id, associativity, getNumQBSAttempts(policy, cfgname, core_id), LSC);
       default:
          return NULL;
    }
@@ -260,4 +260,28 @@ UInt32 CacheSet::getBlockIndexForGivenTag(IntPtr tagToFind)
 	
 	assert(blockIndex!=-1);
 	return blockIndex;
+}
+
+void
+CacheSet::updateLSC(UInt32 lineNum, UInt32 setNum)
+{
+   
+   m_LSC[lineNum]++;
+   printf("HERE %d %d  \n", lineNum, setNum);
+   bool swap = false;
+   UInt32 minLSC=0;
+   if(lineNum>4)
+   {
+      if(m_LSC[lineNum]>1000)
+      {
+         for(int i=1; i<4; i++)
+         {
+            if(m_LSC[minLSC]>m_LSC[i])
+               minLSC = i;
+         }
+         if(m_LSC[minLSC] > m_LSC[lineNum])
+         swap = true;
+         // m_LSC=
+      }
+   }
 }

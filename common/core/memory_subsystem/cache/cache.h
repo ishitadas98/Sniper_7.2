@@ -30,6 +30,7 @@ class Cache : public CacheBase
       CacheSetInfo* m_set_info;
 
       FaultInjector *m_fault_injector;
+      // UInt32 m_LSC[16];
 
       #ifdef ENABLE_SET_USAGE_HIST
       UInt64* m_set_usage_hist;
@@ -69,6 +70,8 @@ class Cache : public CacheBase
       void enable() { m_enabled = true; }
       void disable() { m_enabled = false; }
       UInt32 getBlockIndex(IntPtr addr);
+      UInt32 getSetIndex(IntPtr addr);
+      void updateLSC(UInt32 setNum, UInt32 lineNum);
 };
 
 template <class T>

@@ -15,7 +15,8 @@ Cache::Cache(
    cache_t cache_type,
    hash_t hash,
    FaultInjector *fault_injector,
-   AddressHomeLookup *ahl)
+   AddressHomeLookup *ahl 
+   )
 :
    CacheBase(name, num_sets, associativity, cache_block_size, hash, ahl),
    m_enabled(false),
@@ -195,6 +196,28 @@ Cache::getBlockIndex(IntPtr addr)
 	splitAddress(addr, tag, set_index);
 	
 	BlockIndex = m_sets[set_index]->getBlockIndexForGivenTag(tag);
+   assert(BlockIndex < 16);
 
 	return BlockIndex;
+}
+
+UInt32
+Cache::getSetIndex(IntPtr addr)
+{
+	IntPtr tag;
+	UInt32 set_index;
+	UInt32 BlockIndex;
+	
+	splitAddress(addr, tag, set_index);
+	assert(set_index < m_num_sets);
+	
+	return set_index;
+}
+
+
+void
+Cache::updateLSC(UInt32 setNum, UInt32 lineNum)
+{
+   // printf("Number of sets = %d", m_num_sets);
+   m_sets[setNum]->CacheSet::updateLSC(lineNum, setNum);
 }
