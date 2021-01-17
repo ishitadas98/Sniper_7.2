@@ -196,7 +196,12 @@ Cache::getBlockIndex(IntPtr addr)
 	splitAddress(addr, tag, set_index);
 	
 	BlockIndex = m_sets[set_index]->getBlockIndexForGivenTag(tag);
-   assert(BlockIndex < 16);
+   assert(BlockIndex < m_associativity);
+
+   if(BlockIndex >= m_associativity)
+   {
+      printf("BLOCK NUMBER ERROR \n");
+   }
 
 	return BlockIndex;
 }
@@ -210,6 +215,11 @@ Cache::getSetIndex(IntPtr addr)
 	
 	splitAddress(addr, tag, set_index);
 	assert(set_index < m_num_sets);
+
+   if(set_index >= m_num_sets)
+   {
+      printf("SET NUMBER ERROR \n");
+   }
 	
 	return set_index;
 }
@@ -218,6 +228,8 @@ Cache::getSetIndex(IntPtr addr)
 void
 Cache::updateLSC(UInt32 setNum, UInt32 lineNum)
 {
-   // printf("Number of sets = %d", m_num_sets);
-   m_sets[setNum]->CacheSet::updateLSC(lineNum, setNum);
+   printf("Number of sets = %d \n", m_num_sets);
+   printf("Line Number: %d , Set Number: %d \n", lineNum, setNum);
+   m_sets[setNum]->m_LSC[lineNum]++;
+   printf("Counter Value : %d \n", m_sets[setNum]->m_LSC[lineNum]);
 }

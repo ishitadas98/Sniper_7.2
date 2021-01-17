@@ -23,10 +23,11 @@ class CacheSet
 {
    public:
 
-      static CacheSet* createCacheSet(String cfgname, core_id_t core_id, String replacement_policy, CacheBase::cache_t cache_type, UInt32 associativity, UInt32 blocksize, CacheSetInfo* set_info = NULL, UInt32 LSC[16]={0});
-      static CacheSetInfo* createCacheSetInfo(String name, String cfgname, core_id_t core_id, String replacement_policy, UInt32 associativity, UInt32 LSC[16]={0});
+      static CacheSet* createCacheSet(String cfgname, core_id_t core_id, String replacement_policy, CacheBase::cache_t cache_type, UInt32 associativity, UInt32 blocksize, CacheSetInfo* set_info = NULL);
+      static CacheSetInfo* createCacheSetInfo(String name, String cfgname, core_id_t core_id, String replacement_policy, UInt32 associativity);
       static CacheBase::ReplacementPolicy parsePolicyType(String policy);
       static UInt8 getNumQBSAttempts(CacheBase::ReplacementPolicy, String cfgname, core_id_t core_id);
+      UInt32 m_LSC[16];
 
    protected:
       CacheBlockInfo** m_cache_block_info_array;
@@ -34,12 +35,12 @@ class CacheSet
       UInt32 m_associativity;
       UInt32 m_blocksize;
       Lock m_lock;
-      UInt32 m_LSC[16];
+      
 
    public:
 
       CacheSet(CacheBase::cache_t cache_type,
-            UInt32 associativity, UInt32 blocksize, UInt32 LSC[16]={0});
+            UInt32 associativity, UInt32 blocksize);
       virtual ~CacheSet();
 
       UInt32 getBlockSize() { return m_blocksize; }
@@ -64,7 +65,7 @@ class CacheSet
 
       UInt32 getBlockIndexForGivenTag(IntPtr tagToFind);
 
-      void updateLSC(UInt32 lineNum, UInt32 setNum);
+      // void updateLSC(UInt32 lineNum, UInt32 setNum);
 };
 
 #endif /* CACHE_SET_H */

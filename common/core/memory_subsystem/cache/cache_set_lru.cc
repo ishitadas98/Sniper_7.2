@@ -6,7 +6,7 @@
 
 CacheSetLRU::CacheSetLRU(
       CacheBase::cache_t cache_type,
-      UInt32 associativity, UInt32 blocksize, CacheSetInfoLRU* set_info, UInt8 num_attempts, UInt32 LSC[16])
+      UInt32 associativity, UInt32 blocksize, CacheSetInfoLRU* set_info, UInt8 num_attempts)
    : CacheSet(cache_type, associativity, blocksize)
    , m_num_attempts(num_attempts)
    , m_set_info(set_info)
@@ -95,7 +95,7 @@ CacheSetLRU::moveToMRU(UInt32 accessed_index)
    m_lru_bits[accessed_index] = 0;
 }
 
-CacheSetInfoLRU::CacheSetInfoLRU(String name, String cfgname, core_id_t core_id, UInt32 associativity, UInt8 num_attempts, UInt32 LSC[16])
+CacheSetInfoLRU::CacheSetInfoLRU(String name, String cfgname, core_id_t core_id, UInt32 associativity, UInt8 num_attempts)
    : m_associativity(associativity)
    , m_attempts(NULL)
 {
