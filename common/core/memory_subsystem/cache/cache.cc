@@ -259,6 +259,9 @@ Cache::updateLSC(UInt32 setNum, UInt32 lineNum)
             Byte bytes = 8;
             Byte *in1, *in2, *out1, *out2;
             IntPtr tag1, tag2;
+            CacheBlockInfo *info1;
+            CacheBlockInfo *info2;
+            
             for(UInt32 offset = 0; offset<64; offset+=8)
             {
                m_sets[setNum]->read_line(minSRAMLSClineNum, offset, out1, bytes, false);
@@ -266,12 +269,12 @@ Cache::updateLSC(UInt32 setNum, UInt32 lineNum)
                m_sets[setNum]->write_line(minSRAMLSClineNum, offset, out2, bytes, false);
                m_sets[setNum]->write_line(lineNum, offset, out1, bytes, false);
             }
-            tag1 = m_sets[setNum]->m_cache_block_info_array[minSRAMLSClineNum]->m_tag;
-            tag2 = m_sets[setNum]->m_cache_block_info_array[lineNum]->m_tag;
-            printf("tag1; %d, tag2:%d \n", tag1, tag2);
-            m_sets[setNum]->m_cache_block_info_array[minSRAMLSClineNum]->m_tag = tag2;
-            m_sets[setNum]->m_cache_block_info_array[lineNum]->m_tag = tag1;
-            printf("NEW tag1; %d, tag2:%d \n", m_sets[setNum]->m_cache_block_info_array[minSRAMLSClineNum]->m_tag, m_sets[setNum]->m_cache_block_info_array[lineNum]->m_tag);
+            info1 = m_sets[setNum]->m_cache_block_info_array[minSRAMLSClineNum];
+            info2 = (m_sets[setNum]->m_cache_block_info_array[lineNum]);
+            // printf("tag1; %d, tag2:%d \n", tag1, tag2);
+            m_sets[setNum]->m_cache_block_info_array[minSRAMLSClineNum] = info2;
+            m_sets[setNum]->m_cache_block_info_array[lineNum] = info1;
+            // printf("NEW tag1; %d, tag2:%d \n", m_sets[setNum]->m_cache_block_info_array[minSRAMLSClineNum]->m_tag, m_sets[setNum]->m_cache_block_info_array[lineNum]->m_tag);
 
          }
          for(int i=0; i<16; i++)
