@@ -228,15 +228,59 @@ Cache::getSetIndex(IntPtr addr)
 void
 Cache::updateLSC(UInt32 setNum, UInt32 lineNum)
 {
+   
    // if(setNum == 6435)
    //    toDebug();
-   printf("Number of sets = %d \n", m_num_sets);
-   printf("Line Number: %d , Set Number: %d \n", lineNum, setNum);
+   // printf("Number of sets = %d \n", m_num_sets);
+   // printf("Line Number: %d , Set Number: %d \n", lineNum, setNum);
    // if(setNum<m_num_sets)
    // {
       m_sets[setNum]->m_LSC[lineNum]++;
-      printf("Counter Value : %d \n", m_sets[setNum]->m_LSC[lineNum]);
+      // printf("Counter Value : %d \n", m_sets[setNum]->m_LSC[lineNum]);
    // }
+   UInt32 minSRAMLSC=m_sets[setNum]->m_LSC[lineNum];
+   UInt32 minSRAMLSClineNum = -1;
+   if(lineNum>=4)
+   {
+      if(m_sets[setNum]->m_LSC[lineNum]>=3)
+      {
+         // printf("LSC greater than 3, LSC: %d, Line Number: %d , Set Number: %d \n", m_sets[setNum]->m_LSC[lineNum], lineNum, setNum);
+         for(int i=0; i<4; i++)
+         {
+            if(m_sets[setNum]->m_LSC[i]<minSRAMLSC)
+            {
+               minSRAMLSC = m_sets[setNum]->m_LSC[i];
+               minSRAMLSClineNum = i;
+            }
+         }
+         if(minSRAMLSClineNum!=-1)
+         {
+            // printf("SRAM with minimum LSC, LSC: %d, Line Number: %d , Set Number: %d \n", m_sets[setNum]->m_LSC[minSRAMLSC], minSRAMLSClineNum, setNum);
+            Byte bytes = 8;
+            Byte *in1, *in2, *out1, *out2;
+            IntPtr tag1, tag2;
+            for(UInt32 offset = 0; offset<64; offset+=8)
+            {
+               m_sets[setNum]->read_line(minSRAMLSClineNum, offset, out1, bytes, false);
+               m_sets[setNum]->read_line(lineNum, offset, out2, bytes, false);
+               m_sets[setNum]->write_line(minSRAMLSClineNum, offset, out2, bytes, false);
+               m_sets[setNum]->write_line(lineNum, offset, out1, bytes, false);
+            }
+            tag1 = m_sets[setNum]->m_cache_block_info_array[minSRAMLSClineNum]->m_tag;
+            tag2 = m_sets[setNum]->m_cache_block_info_array[lineNum]->m_tag;
+            printf("tag1; %d, tag2:%d \n", tag1, tag2);
+            m_sets[setNum]->m_cache_block_info_array[minSRAMLSClineNum]->m_tag = tag2;
+            m_sets[setNum]->m_cache_block_info_array[lineNum]->m_tag = tag1;
+            printf("NEW tag1; %d, tag2:%d \n", m_sets[setNum]->m_cache_block_info_array[minSRAMLSClineNum]->m_tag, m_sets[setNum]->m_cache_block_info_array[lineNum]->m_tag);
+
+         }
+         for(int i=0; i<16; i++)
+         {
+            m_sets[setNum]->m_LSC[i]=0;
+         }
+
+      }
+   }
 }
 
 // void Cache::toDebug()

@@ -28,9 +28,10 @@ class CacheSet
       static CacheBase::ReplacementPolicy parsePolicyType(String policy);
       static UInt8 getNumQBSAttempts(CacheBase::ReplacementPolicy, String cfgname, core_id_t core_id);
       UInt32 m_LSC[16];
+      CacheBlockInfo** m_cache_block_info_array;
 
    protected:
-      CacheBlockInfo** m_cache_block_info_array;
+      
       char* m_blocks;
       UInt32 m_associativity;
       UInt32 m_blocksize;

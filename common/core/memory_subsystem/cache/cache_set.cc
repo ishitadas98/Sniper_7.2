@@ -62,6 +62,7 @@ void
 CacheSet::write_line(UInt32 line_index, UInt32 offset, Byte *in_buff, UInt32 bytes, bool update_replacement)
 {
    assert(offset + bytes <= m_blocksize);
+   // printf("Block size: %d \n", m_blocksize);
    //assert((in_buff == NULL) == (bytes == 0));
 
    if (in_buff != NULL && m_blocks != NULL)

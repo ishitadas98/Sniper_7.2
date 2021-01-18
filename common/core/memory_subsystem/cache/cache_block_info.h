@@ -17,11 +17,12 @@ class CacheBlockInfo
 
       static const UInt8 BitsUsedOffset = 3;  // Track usage on 1<<BitsUsedOffset granularity (per 64-bit / 8-byte)
       typedef UInt8 BitsUsedType;      // Enough to store one bit per 1<<BitsUsedOffset byte element per cache line (8 8-byte elements for 64-byte cache lines)
+      IntPtr m_tag;
 
    // This can be extended later to include other information
    // for different cache coherence protocols
    private:
-      IntPtr m_tag;
+      
       CacheState::cstate_t m_cstate;
       UInt64 m_owner;
       BitsUsedType m_used;
