@@ -72,6 +72,7 @@ class Cache : public CacheBase
       UInt32 getBlockIndex(IntPtr addr);
       UInt32 getSetIndex(IntPtr addr);
       void updateLSC(UInt32 setNum, UInt32 lineNum);
+      void toDebug();
 };
 
 template <class T>

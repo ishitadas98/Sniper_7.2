@@ -854,7 +854,7 @@ namespace ParametricDramDirectoryMSI
    {
       UInt32 blockIndex = master->m_cache->getBlockIndex(address);
       UInt32 setIndex = master->m_cache->getSetIndex(address);
-      m_master->m_cache->updateLSC(setIndex,blockIndex);
+      master->m_cache->updateLSC(setIndex,blockIndex);
 
       // if index is 0,1,2,3,4 it is SRAM block, else STTRAM block
       if (blockIndex < WAYS_TO_SRAM)
@@ -1503,8 +1503,9 @@ namespace ParametricDramDirectoryMSI
       case Core::WRITE:
          if (m_mem_component == MemComponent::L3_CACHE)
          {
-            // UInt32 lineNum = m_master->m_cache->getBlockIndex(ca_address);
-            // m_master->m_cache->updateLSC(lineNum);
+            // UInt32 blockIndex = master->m_cache->getBlockIndex(ca_address);
+            // UInt32 setIndex = master->m_cache->getSetIndex(ca_address);
+            // m_master->m_cache->updateLSC(setIndex,blockIndex);
             block_write[block_offset]++;
          }
          m_master->m_cache->accessSingleLine(ca_address + offset, Cache::STORE, data_buf, data_length,

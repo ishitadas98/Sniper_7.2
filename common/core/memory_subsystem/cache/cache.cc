@@ -228,8 +228,16 @@ Cache::getSetIndex(IntPtr addr)
 void
 Cache::updateLSC(UInt32 setNum, UInt32 lineNum)
 {
+   // if(setNum == 6435)
+   //    toDebug();
    printf("Number of sets = %d \n", m_num_sets);
    printf("Line Number: %d , Set Number: %d \n", lineNum, setNum);
-   m_sets[setNum]->m_LSC[lineNum]++;
-   printf("Counter Value : %d \n", m_sets[setNum]->m_LSC[lineNum]);
+   // if(setNum<m_num_sets)
+   // {
+      m_sets[setNum]->m_LSC[lineNum]++;
+      printf("Counter Value : %d \n", m_sets[setNum]->m_LSC[lineNum]);
+   // }
 }
+
+// void Cache::toDebug()
+// {}
