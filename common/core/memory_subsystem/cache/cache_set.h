@@ -27,7 +27,7 @@ class CacheSet
       static CacheSetInfo* createCacheSetInfo(String name, String cfgname, core_id_t core_id, String replacement_policy, UInt32 associativity);
       static CacheBase::ReplacementPolicy parsePolicyType(String policy);
       static UInt8 getNumQBSAttempts(CacheBase::ReplacementPolicy, String cfgname, core_id_t core_id);
-      UInt32 m_LSC[16];
+      UInt32 m_LSC[16][8];
       CacheBlockInfo** m_cache_block_info_array;
 
    protected:
@@ -66,7 +66,7 @@ class CacheSet
 
       UInt32 getBlockIndexForGivenTag(IntPtr tagToFind);
 
-      // void updateLSC(UInt32 lineNum, UInt32 setNum);
+      
 };
 
 #endif /* CACHE_SET_H */

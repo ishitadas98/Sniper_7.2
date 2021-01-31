@@ -71,7 +71,7 @@ class Cache : public CacheBase
       void disable() { m_enabled = false; }
       UInt32 getBlockIndex(IntPtr addr);
       UInt32 getSetIndex(IntPtr addr);
-      void updateLSC(UInt32 setNum, UInt32 lineNum);
+      void updateLSC(UInt32 setNum, UInt32 lineNum, UInt32 offset);
       void toDebug();
 };
 

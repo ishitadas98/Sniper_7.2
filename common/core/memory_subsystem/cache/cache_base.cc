@@ -122,3 +122,5 @@ CacheBase::tagToAddress(const IntPtr tag)
 {
    return tag << m_log_blocksize;
 }
+
+

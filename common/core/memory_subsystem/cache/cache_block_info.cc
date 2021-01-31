@@ -27,7 +27,12 @@ CacheBlockInfo::CacheBlockInfo(IntPtr tag, CacheState::cstate_t cstate, UInt64 o
    m_owner(0),
    m_used(0),
    m_options(options)
-{}
+{
+   for(int i=0; i<8; i++)
+   {
+      m_offset_tag[i] = i*8;
+   }
+}
 
 CacheBlockInfo::~CacheBlockInfo()
 {}

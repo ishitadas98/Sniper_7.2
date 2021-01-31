@@ -37,8 +37,8 @@ static UInt64 g_NumberL2WritebacksToL3;
  * In such a case, there is not need account for write to LLC (LLC being STTRAM)
  */
 // #define WAYS_TO_SRAM    4
-// #define WAYS_TO_SRAM    16
-#define WAYS_TO_SRAM 4
+#define WAYS_TO_SRAM    16
+// #define WAYS_TO_SRAM 4
 
 static UInt64 block_write[8] = {0};
 static UInt64 block_read[8] = {0};
@@ -854,39 +854,39 @@ namespace ParametricDramDirectoryMSI
    {
       UInt32 blockIndex = master->m_cache->getBlockIndex(address);
       UInt32 setIndex = master->m_cache->getSetIndex(address);
-      master->m_cache->updateLSC(setIndex,blockIndex);
+      master->m_cache->updateLSC(setIndex,blockIndex, block_offset);
 
       // if index is 0,1,2,3,4 it is SRAM block, else STTRAM block
-      if (blockIndex < WAYS_TO_SRAM)
-      {
-         getMemoryManager()->incrElapsedTime(m_mem_component,
-                                             CachePerfModel::ACCESS_CACHE_DATA_AND_TAGS,
-                                             ShmemPerfModel::_USER_THREAD);
-      }
-      else
-      {
-         getMemoryManager()->incrElapsedTime(m_mem_component,
-                                             CachePerfModel::ACCESS_CACHE_WRITEDATA_AND_TAGS,
-                                             ShmemPerfModel::_USER_THREAD);
-      }
+      // if (blockIndex < WAYS_TO_SRAM)
+      // {
+      //    getMemoryManager()->incrElapsedTime(m_mem_component,
+      //                                        CachePerfModel::ACCESS_CACHE_DATA_AND_TAGS,
+      //                                        ShmemPerfModel::_USER_THREAD);
+      // }
+      // else
+      // {
+      //    getMemoryManager()->incrElapsedTime(m_mem_component,
+      //                                        CachePerfModel::ACCESS_CACHE_WRITEDATA_AND_TAGS,
+      //                                        ShmemPerfModel::_USER_THREAD);
+      // }
 
       // printf("Block offset = %d\n", block_offset);
 
-      //  if(block_offset < 2)
-      //  {
-      //  	// printf("============Block 0============\n");
-      //    getMemoryManager()->incrElapsedTime(m_mem_component,
-      //                                          CachePerfModel::ACCESS_CACHE_DATA_AND_TAGS,
-      //                                          ShmemPerfModel::_USER_THREAD);
-      //       // writingblock0 = writingblock0+1;
-      //  }
-      //  else
-      //  {
-      //    // printf("=////////////////Block not 0////////////\n");
-      //  	getMemoryManager()->incrElapsedTime(m_mem_component,
-      //                                          CachePerfModel::ACCESS_CACHE_WRITEDATA_AND_TAGS,
-      //                                          ShmemPerfModel::_USER_THREAD);
-      //  }
+       if(block_offset < 2)
+       {
+       	// printf("============Block 0============\n");
+         getMemoryManager()->incrElapsedTime(m_mem_component,
+                                               CachePerfModel::ACCESS_CACHE_DATA_AND_TAGS,
+                                               ShmemPerfModel::_USER_THREAD);
+            // writingblock0 = writingblock0+1;
+       }
+       else
+       {
+         // printf("=////////////////Block not 0////////////\n");
+       	getMemoryManager()->incrElapsedTime(m_mem_component,
+                                               CachePerfModel::ACCESS_CACHE_WRITEDATA_AND_TAGS,
+                                               ShmemPerfModel::_USER_THREAD);
+       }
    }
 
    //////////////////////////////////////////////////////////////////////////////////////////////

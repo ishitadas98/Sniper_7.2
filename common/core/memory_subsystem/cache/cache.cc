@@ -93,6 +93,7 @@ Cache::accessSingleLine(IntPtr addr, access_t access_type,
    UInt32 block_offset;
 
    splitAddress(addr, tag, set_index, block_offset);
+   
 
    CacheSet* set = m_sets[set_index];
    CacheBlockInfo* cache_block_info = set->find(tag, &line_index);
@@ -100,6 +101,10 @@ Cache::accessSingleLine(IntPtr addr, access_t access_type,
    if (cache_block_info == NULL)
       return NULL;
 
+   printf("Block Offset: %d Bytes: %d \n", block_offset, bytes);
+   if(bytes!=0)
+      block_offset = cache_block_info->getOffsetTag(block_offset/8);
+   
    if (access_type == LOAD)
    {
       // NOTE: assumes error occurs in memory. If we want to model bus errors, insert the error into buff instead
@@ -226,61 +231,65 @@ Cache::getSetIndex(IntPtr addr)
 
 
 void
-Cache::updateLSC(UInt32 setNum, UInt32 lineNum)
+Cache::updateLSC(UInt32 setNum, UInt32 lineNum, UInt32 offset)
 {
    
    // if(setNum == 6435)
    //    toDebug();
    // printf("Number of sets = %d \n", m_num_sets);
-   // printf("Line Number: %d , Set Number: %d \n", lineNum, setNum);
+   // printf("Line Number: %d , Set Number: %d Offset: %d \n", lineNum, setNum, offset);
    // if(setNum<m_num_sets)
    // {
-      if(m_sets[setNum]->m_LSC[lineNum]<7)
-         m_sets[setNum]->m_LSC[lineNum]++;
-      // printf("Counter Value : %d \n", m_sets[setNum]->m_LSC[lineNum]);
+      if(m_sets[setNum]->m_LSC[lineNum][offset]<7)
+         m_sets[setNum]->m_LSC[lineNum][offset]++;
+      // printf("Counter Value : %d \n", m_sets[setNum]->m_LSC[lineNum][offset]);
    // }
-   UInt32 minSRAMLSC=m_sets[setNum]->m_LSC[lineNum];
-   UInt32 minSRAMLSClineNum = -1;
-   if(lineNum>=4)
+   UInt32 minSRAMLSC=m_sets[setNum]->m_LSC[lineNum][offset];
+   UInt32 minSRAMLSCoffset = -1;
+   if(offset>1)
    {
-      if(m_sets[setNum]->m_LSC[lineNum]>=3)
+      if(m_sets[setNum]->m_LSC[lineNum][offset]>=3)
       {
-         // printf("LSC greater than 3, LSC: %d, Line Number: %d , Set Number: %d \n", m_sets[setNum]->m_LSC[lineNum], lineNum, setNum);
-         for(int i=0; i<4; i++)
+         // printf("LSC greater than 3, LSC: %d, Line Number: %d , Set Number: %d Offset: %d \n", m_sets[setNum]->m_LSC[lineNum][offset], lineNum, setNum, offset);
+         for(int i=0; i<2; i++)
          {
-            if(m_sets[setNum]->m_LSC[i]<minSRAMLSC)
+            if(m_sets[setNum]->m_LSC[lineNum][i]<minSRAMLSC)
             {
-               minSRAMLSC = m_sets[setNum]->m_LSC[i];
-               minSRAMLSClineNum = i;
+               minSRAMLSC = m_sets[setNum]->m_LSC[lineNum][i];
+               minSRAMLSCoffset = i;
             }
          }
-         if(minSRAMLSClineNum!=-1)
+         if(minSRAMLSCoffset!=-1)
          {
-            // printf("SRAM with minimum LSC, LSC: %d, Line Number: %d , Set Number: %d \n", m_sets[setNum]->m_LSC[minSRAMLSC], minSRAMLSClineNum, setNum);
+            // printf("SRAM with minimum LSC, LSC: %d, Line Number: %d , Set Number: %d \n", m_sets[setNum]->m_LSC[minSRAMLSC], minSRAMLSCoffset, setNum);
             Byte bytes = 8;
             Byte *in1, *in2, *out1, *out2;
             IntPtr tag1, tag2;
             CacheBlockInfo *info1;
             CacheBlockInfo *info2;
+            UInt32 offsetVal = offset*bytes;
+            UInt32 minOffsetVal = minSRAMLSCoffset*bytes;
             
-            for(UInt32 offset = 0; offset<64; offset+=8)
-            {
-               m_sets[setNum]->read_line(minSRAMLSClineNum, offset, out1, bytes, false);
-               m_sets[setNum]->read_line(lineNum, offset, out2, bytes, false);
-               m_sets[setNum]->write_line(minSRAMLSClineNum, offset, out2, bytes, false);
-               m_sets[setNum]->write_line(lineNum, offset, out1, bytes, false);
-            }
-            info1 = m_sets[setNum]->m_cache_block_info_array[minSRAMLSClineNum];
-            info2 = (m_sets[setNum]->m_cache_block_info_array[lineNum]);
-            // printf("tag1; %d, tag2:%d \n", tag1, tag2);
-            m_sets[setNum]->m_cache_block_info_array[minSRAMLSClineNum] = info2;
-            m_sets[setNum]->m_cache_block_info_array[lineNum] = info1;
-            // printf("NEW tag1; %d, tag2:%d \n", m_sets[setNum]->m_cache_block_info_array[minSRAMLSClineNum]->m_tag, m_sets[setNum]->m_cache_block_info_array[lineNum]->m_tag);
+            
+            m_sets[setNum]->read_line(lineNum, minOffsetVal, out1, bytes, false);
+            m_sets[setNum]->read_line(lineNum, offsetVal, out2, bytes, false);
+            m_sets[setNum]->write_line(lineNum, minOffsetVal, out2, bytes, false);
+            m_sets[setNum]->write_line(lineNum, offsetVal, out1, bytes, false);
+
+            m_sets[setNum]->m_cache_block_info_array[lineNum]->m_offset_tag[minSRAMLSCoffset] = offsetVal;
+            m_sets[setNum]->m_cache_block_info_array[lineNum]->m_offset_tag[offset] = minOffsetVal;
+            
+            // info1 = m_sets[setNum]->m_cache_block_info_array[minSRAMLSCoffset];
+            // info2 = (m_sets[setNum]->m_cache_block_info_array[lineNum][offset]);
+            // // printf("tag1; %d, tag2:%d \n", tag1, tag2);
+            // m_sets[setNum]->m_cache_block_info_array[minSRAMLSCoffset] = info2;
+            // m_sets[setNum]->m_cache_block_info_array[lineNum][offset] = info1;
+            // printf("NEW tag1; %d, tag2:%d \n", m_sets[setNum]->m_cache_block_info_array[minSRAMLSCoffset]->m_tag, m_sets[setNum]->m_cache_block_info_array[lineNum]->m_tag);
 
          }
-         for(int i=0; i<16; i++)
+         for(int i=0; i<8; i++)
          {
-            m_sets[setNum]->m_LSC[i]=0;
+            m_sets[setNum]->m_LSC[lineNum][i]=0;
          }
 
       }

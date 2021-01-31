@@ -18,6 +18,7 @@ class CacheBlockInfo
       static const UInt8 BitsUsedOffset = 3;  // Track usage on 1<<BitsUsedOffset granularity (per 64-bit / 8-byte)
       typedef UInt8 BitsUsedType;      // Enough to store one bit per 1<<BitsUsedOffset byte element per cache line (8 8-byte elements for 64-byte cache lines)
       IntPtr m_tag;
+      IntPtr m_offset_tag[8];
 
    // This can be extended later to include other information
    // for different cache coherence protocols
@@ -44,6 +45,8 @@ class CacheBlockInfo
       bool isValid() const { return (m_tag != ((IntPtr) ~0)); }
 
       IntPtr getTag() const { return m_tag; }
+      UInt32 getOffsetTag(UInt32 block_offset) const { printf("Parameter Offset: %d  Member Offset: %d \n", block_offset, m_offset_tag[block_offset]);
+      return m_offset_tag[block_offset];}
       CacheState::cstate_t getCState() const { return m_cstate; }
 
       void setTag(IntPtr tag) { m_tag = tag; }

@@ -33,7 +33,8 @@ CacheSet::CacheSet(CacheBase::cache_t cache_type,
    for(int i=0; i<16; i++)
    {
       // printf("LSC %d : %d \n", i, LSC[i]);
-      m_LSC[i] = 0;
+      for (int j =0; j<8; j++)
+         m_LSC[i][j] = 0;
    }
 }
 
@@ -48,7 +49,12 @@ CacheSet::~CacheSet()
 void
 CacheSet::read_line(UInt32 line_index, UInt32 offset, Byte *out_buff, UInt32 bytes, bool update_replacement)
 {
+   // if(offset + bytes > m_blocksize)
+   // {
+   //    printf("Offset: %d, Bytes: %d, Block Size: %d \n", offset, bytes, m_blocksize);
+   // }
    assert(offset + bytes <= m_blocksize);
+   // printf("Offset: %d, Bytes: %d, Block Size: %d \n", offset, bytes, m_blocksize);
    //assert((out_buff == NULL) == (bytes == 0));
 
    if (out_buff != NULL && m_blocks != NULL)
@@ -62,6 +68,7 @@ void
 CacheSet::write_line(UInt32 line_index, UInt32 offset, Byte *in_buff, UInt32 bytes, bool update_replacement)
 {
    assert(offset + bytes <= m_blocksize);
+   // printf("Offset: %d, Bytes: %d, Block Size: %d \n", offset, bytes, m_blocksize);
    // printf("Block size: %d \n", m_blocksize);
    //assert((in_buff == NULL) == (bytes == 0));
 
@@ -268,31 +275,4 @@ UInt32 CacheSet::getBlockIndexForGivenTag(IntPtr tagToFind)
 	return blockIndex;
 }
 
-// void
-// CacheSet::updateLSC(UInt32 lineNum, UInt32 setNum)
-// {
-// try{
-//    printf("HERE %d %d %d \n", lineNum, setNum, m_LSC[lineNum]);
-//    // printf("POSITION %d %d \n", lineNum, setNum);
-//    m_LSC[lineNum]=m_LSC[lineNum]+1;
-// }
-// catch(std::exception& e){
-//    printf("ERROR %d %d \n", lineNum, setNum);
-// }
-//    // bool swap = false;
-//    // UInt32 minLSC=0;
-//    // if(lineNum>4)
-//    // {
-//    //    if(m_LSC[lineNum]>1000)
-//    //    {
-//    //       for(int i=1; i<4; i++)
-//    //       {
-//    //          if(m_LSC[minLSC]>m_LSC[i])
-//    //             minLSC = i;
-//    //       }
-//    //       if(m_LSC[minLSC] > m_LSC[lineNum])
-//    //       swap = true;
-//    //       // m_LSC=
-//    //    }
-//    // }
-// }
+
