@@ -235,7 +235,8 @@ Cache::updateLSC(UInt32 setNum, UInt32 lineNum)
    // printf("Line Number: %d , Set Number: %d \n", lineNum, setNum);
    // if(setNum<m_num_sets)
    // {
-      m_sets[setNum]->m_LSC[lineNum]++;
+      if(m_sets[setNum]->m_LSC[lineNum]<7)
+         m_sets[setNum]->m_LSC[lineNum]++;
       // printf("Counter Value : %d \n", m_sets[setNum]->m_LSC[lineNum]);
    // }
    UInt32 minSRAMLSC=m_sets[setNum]->m_LSC[lineNum];
