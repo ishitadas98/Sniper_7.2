@@ -101,9 +101,9 @@ Cache::accessSingleLine(IntPtr addr, access_t access_type,
    if (cache_block_info == NULL)
       return NULL;
 
-   printf("Block Offset: %d Bytes: %d \n", block_offset, bytes);
-   if(bytes!=0)
-      block_offset = cache_block_info->getOffsetTag(block_offset/8);
+   // printf("Block Offset: %d Bytes: %d \n", block_offset, bytes);
+   // if(bytes!=0)
+   //    block_offset = cache_block_info->getOffsetTag(block_offset/8);
    
    if (access_type == LOAD)
    {

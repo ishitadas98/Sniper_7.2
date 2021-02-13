@@ -64,6 +64,8 @@ class CacheBlockInfo
       bool updateUsage(BitsUsedType used);
 
       static const char* getOptionName(option_t option);
+
+      IntPtr findActualOffset(UInt32 offset);
 };
 
 class CacheCntlr

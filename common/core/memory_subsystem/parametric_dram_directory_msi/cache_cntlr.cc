@@ -425,7 +425,7 @@ namespace ParametricDramDirectoryMSI
       //eip_global_2=eip;
       HitWhere::where_t hit_where = HitWhere::MISS;
 
-      block_offset = offset / 8;
+      
 
       // Protect against concurrent access from sibling SMT threads
       ScopedLock sl_smt(m_master->m_smt_lock);
@@ -462,6 +462,8 @@ namespace ParametricDramDirectoryMSI
 
       CacheBlockInfo *cache_block_info;
       bool cache_hit = operationPermissibleinCache(ca_address, mem_op_type, &cache_block_info), prefetch_hit = false;
+
+      block_offset = (cache_block_info->findActualOffset(offset));
 
       if (!cache_hit && m_perfect)
       {
@@ -1506,6 +1508,7 @@ namespace ParametricDramDirectoryMSI
             // UInt32 blockIndex = master->m_cache->getBlockIndex(ca_address);
             // UInt32 setIndex = master->m_cache->getSetIndex(ca_address);
             // m_master->m_cache->updateLSC(setIndex,blockIndex);
+            
             block_write[block_offset]++;
          }
          m_master->m_cache->accessSingleLine(ca_address + offset, Cache::STORE, data_buf, data_length,
@@ -1577,6 +1580,7 @@ namespace ParametricDramDirectoryMSI
    {
       if (m_mem_component == MemComponent::L3_CACHE)
       {
+         
          block_read[block_offset]++;
       }
       __attribute__((unused)) SharedCacheBlockInfo *cache_block_info = (SharedCacheBlockInfo *)m_master->m_cache->accessSingleLine(
@@ -1610,6 +1614,7 @@ namespace ParametricDramDirectoryMSI
             // printf("%d \n", m_master->m_cache->getBlockIndex(address));
             // UInt32 lineNum = m_master->m_cache->getBlockIndex(address);
             // m_master->m_cache->updateLSC(lineNum);
+            
             block_write[block_offset]++;}
       }
 
@@ -2033,6 +2038,7 @@ namespace ParametricDramDirectoryMSI
             // printf("%d \n", m_master->m_cache->getBlockIndex(address));
             // UInt32 lineNum = m_master->m_cache->getBlockIndex(address);
             // m_master->m_cache->updateLSC(lineNum);
+            
             block_write[block_offset]++;
          }
          __attribute__((unused)) SharedCacheBlockInfo *cache_block_info = (SharedCacheBlockInfo *)m_master->m_cache->accessSingleLine(

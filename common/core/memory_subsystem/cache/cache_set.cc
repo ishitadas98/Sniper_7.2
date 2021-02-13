@@ -51,12 +51,14 @@ CacheSet::read_line(UInt32 line_index, UInt32 offset, Byte *out_buff, UInt32 byt
 {
    // if(offset + bytes > m_blocksize)
    // {
-   //    printf("Offset: %d, Bytes: %d, Block Size: %d \n", offset, bytes, m_blocksize);
+      // printf("Offset: %d, Bytes: %d, Block Size: %d \n", offset, bytes, m_blocksize);
    // }
+   
    assert(offset + bytes <= m_blocksize);
    // printf("Offset: %d, Bytes: %d, Block Size: %d \n", offset, bytes, m_blocksize);
    //assert((out_buff == NULL) == (bytes == 0));
-
+   // UInt32 offset_tag = m_cache_block_info_array[line_index]->getOffsetTag(offset);
+   
    if (out_buff != NULL && m_blocks != NULL)
       memcpy((void*) out_buff, &m_blocks[line_index * m_blocksize + offset], bytes);
 
@@ -72,8 +74,10 @@ CacheSet::write_line(UInt32 line_index, UInt32 offset, Byte *in_buff, UInt32 byt
    // printf("Block size: %d \n", m_blocksize);
    //assert((in_buff == NULL) == (bytes == 0));
 
-   if (in_buff != NULL && m_blocks != NULL)
+   if (in_buff != NULL && m_blocks != NULL){
+       printf("in_buff: %d \n", in_buff);
       memcpy(&m_blocks[line_index * m_blocksize + offset], (void*) in_buff, bytes);
+   }
 
    if (update_replacement)
       updateReplacementIndex(line_index);

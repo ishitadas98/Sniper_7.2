@@ -93,3 +93,14 @@ CacheBlockInfo::updateUsage(BitsUsedType used)
    m_used |= used;                     // Update usage mask
    return new_bits_set;
 }
+
+IntPtr
+CacheBlockInfo::findActualOffset(UInt32 offset)
+{
+   for(int i=0; i<8; i++)
+   {
+      if(m_offset_tag[i] == offset)
+         return i ;
+   }
+   return NULL;
+}
