@@ -391,6 +391,9 @@ CacheCntlr::processMemOpFromCore(
    //eip_global_2=eip;
    HitWhere::where_t hit_where = HitWhere::MISS;
 
+   // if(HitWhere::where_t(m_mem_component)==MemComponent::L3_CACHE)
+   //    printf("Data length in where_t: %d \n", data_length);
+
    block_offset = offset/8;
 
    // Protect against concurrent access from sibling SMT threads
@@ -1477,6 +1480,7 @@ CacheCntlr::accessCache(
          if(m_mem_component == MemComponent::L3_CACHE)
          {
             block_write[block_offset]++;
+            // printf("Data length: %d block offset: %d \n", data_length, block_offset);
          }
          m_master->m_cache->accessSingleLine(ca_address + offset, Cache::STORE, data_buf, data_length,
                                              getShmemPerfModel()->getElapsedTime(ShmemPerfModel::_USER_THREAD), update_replacement);
@@ -2012,6 +2016,7 @@ CacheCntlr::writeCacheBlock(IntPtr address, UInt32 offset, Byte* data_buf, UInt3
       if(m_mem_component == MemComponent::L3_CACHE)
       {
          block_write[block_offset]++;
+         // printf("Data length: %d block offset: %d \n", data_length, block_offset);
       }
       __attribute__((unused)) SharedCacheBlockInfo* cache_block_info = (SharedCacheBlockInfo*) m_master->m_cache->accessSingleLine(
          address + offset, Cache::STORE, data_buf, data_length, getShmemPerfModel()->getElapsedTime(thread_num), false);

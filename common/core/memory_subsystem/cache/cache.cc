@@ -91,7 +91,10 @@ Cache::accessSingleLine(IntPtr addr, access_t access_type,
    UInt32 line_index = -1;
    UInt32 block_offset;
 
+   
+
    splitAddress(addr, tag, set_index, block_offset);
+   // printf("Offset: %d \n", block_offset);
 
    CacheSet* set = m_sets[set_index];
    CacheBlockInfo* cache_block_info = set->find(tag, &line_index);
@@ -109,6 +112,7 @@ Cache::accessSingleLine(IntPtr addr, access_t access_type,
    }
    else
    {
+      // printf("Bytes: %d \n", bytes);
       set->write_line(line_index, block_offset, buff, bytes, update_replacement);
 
       // NOTE: assumes error occurs in memory. If we want to model bus errors, insert the error into buff instead
