@@ -38,10 +38,10 @@ for traces in $path_to_trace1/*.sift
 
 for i in {0..3}
   do
-    echo "./run-sniper -n 1 -c ./config/stride_only/gainestown$2 -d $path_to_res"/"  --traces=${tr_list1[i]}
+    echo "./run-sniper -n 1 -c ./config/stride_only/gainestown$2 -d $path_to_res"/" --traces=${tr_list1[i]}
 	echo "mv $path_to_res"/"sim.out $path_to_res"/"$1$(grep -o "_[0-9]\+"<<<${tr_list1[i]})
     #./run-sniper -n 1 -c gainestown$2 -d $path_to_res"/" -g --perf_model/l3_cache/cache_size=8192 --traces=${tr_list1[i]}
-    ./run-sniper -n 1 -c gainestown$2 -d $path_to_res"/" --traces=${tr_list1[i]}
+    ./run-sniper -n 1 -c gainestown$2 -d $path_to_res"/"  --traces=${tr_list1[i]}
 
     # we can test if all the 4 files have been created
     filename1=$path_to_res"/"sim.out
