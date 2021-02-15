@@ -244,6 +244,9 @@ Cache::updateLSC(UInt32 setNum, UInt32 lineNum, UInt32 offset)
          m_sets[setNum]->m_LSC[lineNum][offset]++;
       // printf("Counter Value : %d \n", m_sets[setNum]->m_LSC[lineNum][offset]);
    // }
+   // for(int i=0; i<8; i++)
+   //    printf("%d ", m_sets[setNum]->m_LSC[lineNum][i]);
+   // printf("\n");
    UInt32 minSRAMLSC=m_sets[setNum]->m_LSC[lineNum][offset];
    UInt32 minSRAMLSCoffset = -1;
    if(offset>1)
@@ -264,9 +267,9 @@ Cache::updateLSC(UInt32 setNum, UInt32 lineNum, UInt32 offset)
             // printf("SRAM with minimum LSC, LSC: %d, Line Number: %d , Set Number: %d \n", m_sets[setNum]->m_LSC[minSRAMLSC], minSRAMLSCoffset, setNum);
             Byte bytes = 8;
             Byte *in1, *in2, *out1, *out2;
-            IntPtr tag1, tag2;
-            CacheBlockInfo *info1;
-            CacheBlockInfo *info2;
+            // IntPtr tag1, tag2;
+            // CacheBlockInfo *info1;
+            // CacheBlockInfo *info2;
             UInt32 offsetVal = offset*bytes;
             UInt32 minOffsetVal = minSRAMLSCoffset*bytes;
             
@@ -278,6 +281,11 @@ Cache::updateLSC(UInt32 setNum, UInt32 lineNum, UInt32 offset)
 
             m_sets[setNum]->m_cache_block_info_array[lineNum]->m_offset_tag[minSRAMLSCoffset] = offsetVal;
             m_sets[setNum]->m_cache_block_info_array[lineNum]->m_offset_tag[offset] = minOffsetVal;
+
+            // printf("EXCHANGE \n:");
+            // for(int i=0; i<8; i++)
+            //    printf("%d ", m_sets[setNum]->m_cache_block_info_array[lineNum]->m_offset_tag[i]);
+            // printf("\n");
             
             // info1 = m_sets[setNum]->m_cache_block_info_array[minSRAMLSCoffset];
             // info2 = (m_sets[setNum]->m_cache_block_info_array[lineNum][offset]);

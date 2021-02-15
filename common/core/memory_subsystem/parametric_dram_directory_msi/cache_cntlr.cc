@@ -460,21 +460,31 @@ namespace ParametricDramDirectoryMSI
 
       SubsecondTime t_start = getShmemPerfModel()->getElapsedTime(ShmemPerfModel::_USER_THREAD);
 
+      // printf("creating cache_block_info \n");
       CacheBlockInfo *cache_block_info;
+      // printf("created cache_block_info \n");
+      // printf("%d \n", cache_block_info->temp);
       bool cache_hit = operationPermissibleinCache(ca_address, mem_op_type, &cache_block_info), prefetch_hit = false;
-
-      block_offset = (cache_block_info->findActualOffset(offset));
+   
+     
+      // block_offset = offset / 8;
+   
 
       if (!cache_hit && m_perfect)
       {
          cache_hit = true;
          hit_where = HitWhere::where_t(m_mem_component);
-         if (cache_block_info)
+         if (cache_block_info){
+            // printf("HERE \n");
             cache_block_info->setCState(CacheState::MODIFIED);
+            //  block_offset = cache_block_info->findActualOffset(offset);
+            }
          else
          {
             insertCacheBlock(ca_address, mem_op_type == Core::READ ? CacheState::SHARED : CacheState::MODIFIED, NULL, m_core_id, ShmemPerfModel::_USER_THREAD); //, eip);
             cache_block_info = getCacheBlockInfo(ca_address);
+            // printf("HERE \n");
+            
          }
       }
       else if (cache_hit && m_passthrough)
@@ -483,6 +493,7 @@ namespace ParametricDramDirectoryMSI
          cache_block_info->invalidate();
          cache_block_info = NULL;
       }
+       
 
       if (count)
       {
@@ -491,6 +502,8 @@ namespace ParametricDramDirectoryMSI
          getCache()->updateCounters(cache_hit);
          updateCounters(mem_op_type, ca_address, cache_hit, getCacheState(cache_block_info), Prefetch::NONE);
       }
+
+      
 
       if (cache_hit)
       {
@@ -706,6 +719,10 @@ namespace ParametricDramDirectoryMSI
          Sim()->getConfig()->getCacheEfficiencyCallbacks().call_notify_access(cache_block_info->getOwner(), mem_op_type, hit_where);
 
       MYLOG("returning %s, latency %lu ns", HitWhereString(hit_where), total_latency.getNS());
+
+      block_offset = cache_block_info->findActualOffset(offset);
+      if(offset/8 != block_offset)
+         printf("offset: %d Block offset: %d \n", offset, block_offset);
       return hit_where;
    }
 

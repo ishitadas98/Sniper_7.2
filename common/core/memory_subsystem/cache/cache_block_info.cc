@@ -31,6 +31,7 @@ CacheBlockInfo::CacheBlockInfo(IntPtr tag, CacheState::cstate_t cstate, UInt64 o
    for(int i=0; i<8; i++)
    {
       m_offset_tag[i] = i*8;
+      // printf("offset val at %d : %d \n", i, m_offset_tag[i]);
    }
 }
 
@@ -94,13 +95,19 @@ CacheBlockInfo::updateUsage(BitsUsedType used)
    return new_bits_set;
 }
 
-IntPtr
+UInt32
 CacheBlockInfo::findActualOffset(UInt32 offset)
 {
    for(int i=0; i<8; i++)
    {
-      if(m_offset_tag[i] == offset)
+      // printf("Tag_val: %d Offset: %d\n", m_offset_tag[i], offset);
+      if(m_offset_tag[i] == offset){
+         // printf("TRUE \n");
          return i ;
+      }
    }
-   return NULL;
+   // if(m_offset_tag != NULL)
+   //    printf("NOT NULL %d \n", m_offset_tag.size());
+   // return NULL;
+   return offset/8;
 }
