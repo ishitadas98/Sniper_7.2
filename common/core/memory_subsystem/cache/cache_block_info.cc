@@ -27,7 +27,12 @@ CacheBlockInfo::CacheBlockInfo(IntPtr tag, CacheState::cstate_t cstate, UInt64 o
    m_owner(0),
    m_used(0),
    m_options(options)
-{}
+{
+   for(int i =0; i<8; i++)
+   {
+      dirty_word[i]=0;
+   }
+}
 
 CacheBlockInfo::~CacheBlockInfo()
 {}
@@ -67,6 +72,8 @@ CacheBlockInfo::clone(CacheBlockInfo* cache_block_info)
    m_owner = cache_block_info->m_owner;
    m_used = cache_block_info->m_used;
    m_options = cache_block_info->m_options;
+   for(int i =0; i<8; i++)
+      dirty_word[i] = cache_block_info->dirty_word[i];
 }
 
 bool

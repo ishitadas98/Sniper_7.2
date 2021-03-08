@@ -12,6 +12,7 @@
 
 #include <cstring>
 
+extern int g_inst_in_roi;
 //IntPtr eip_global;
 //IntPtr eip_global_2;
 static UInt64 g_NumberOfL3WritesDueToWriteBack; //nss
@@ -44,6 +45,8 @@ static UInt64 g_NumberL2WritebacksToL3;
 static UInt64 block_write[8] = {0};
 static UInt64 block_read[8] = {0};
 UInt32 block_offset;
+UInt32 write_size;
+IntPtr PC;
 //UInt32 writingblock0=0;
 
 // Define to allow private L2 caches not to take the stack lock.
@@ -383,7 +386,8 @@ CacheCntlr::processMemOpFromCore(
       IntPtr ca_address, UInt32 offset,
       Byte* data_buf, UInt32 data_length,
       bool modeled,
-      bool count) //,
+      bool count,
+      IntPtr eip) //,
       //IntPtr eip) //sn eip(PC) added by arindam
 {
 
@@ -392,9 +396,10 @@ CacheCntlr::processMemOpFromCore(
    HitWhere::where_t hit_where = HitWhere::MISS;
 
    // if(HitWhere::where_t(m_mem_component)==MemComponent::L3_CACHE)
-   //    printf("Data length in where_t: %d \n", data_length);
-
+      // printf("Data length in where_t: %d \n", data_length);
+   write_size = data_length;
    block_offset = offset/8;
+   PC = eip;
 
    // Protect against concurrent access from sibling SMT threads
    ScopedLock sl_smt(m_master->m_smt_lock);
@@ -674,6 +679,23 @@ MYLOG("access done");
       Sim()->getConfig()->getCacheEfficiencyCallbacks().call_notify_access(cache_block_info->getOwner(), mem_op_type, hit_where);
 
    MYLOG("returning %s, latency %lu ns", HitWhereString(hit_where), total_latency.getNS());
+
+   // #if 1
+   //    if (g_inst_in_roi)
+   //    {
+   //       int *p = (int *) 0x60152c;
+   //       printf("%d\n", *p);
+   //       #if 0
+   //          printf("%s address:0x%lx offset:%2d size:%d HitWhere:%10s, addresslatency %lu ns\n",
+   //          mem_op_type == Core::WRITE ? "WR" : "RD", ca_address,
+   //          offset, data_length, HitWhereString(hit_where), total_latency.getNS());
+   //          char *address = (char *) ca_address;
+   //          printf("content at address: 0x%lx is %d\n", ca_address, *address);
+   //       #endif
+   //    }
+   // #endif
+   // g_inst_in_roi = 0;
+
    return hit_where;
 }
 
@@ -826,6 +848,7 @@ CacheCntlr::doPrefetch(IntPtr prefetch_address, SubsecondTime t_start)
 void CacheCntlr::accountForWriteLatencyOfLLC(IntPtr address, CacheMasterCntlr* master)
 {
     UInt32 blockIndex = master->m_cache->getBlockIndex(address);
+   //  printf("PC: %d \n", PC);
 
     
 
@@ -1464,24 +1487,51 @@ CacheCntlr::accessCache(
       Core::mem_op_t mem_op_type, IntPtr ca_address, UInt32 offset,
       Byte* data_buf, UInt32 data_length, bool update_replacement)
 {
+   // MYLOG("accessCache %lx mem_op_type:%d offset %d: data_length %d",
+   //       ca_address, mem_op_type, offset, data_length);
+
    switch (mem_op_type)
    {
       case Core::READ:
       case Core::READ_EX:
+         // MYLOG("READ/EX: accessCache %lx mem_op_type:%d offset %d: data_length %d m_mem_component:%d",
+         // ca_address, mem_op_type, offset, data_length, m_mem_component);
+
          if(m_mem_component == MemComponent::L3_CACHE)
          {
-            block_read[block_offset]++;
+            // block_read[block_offset]++;
+            // printf("Write2 @0x%lx offset:%2d g_blockOffset:%2d, size:%2d g_bytesAccessed:%2d \n",
+                  //   ca_address, offset, block_offset, data_length, write_size);
          }
          m_master->m_cache->accessSingleLine(ca_address + offset, Cache::LOAD, data_buf, data_length,
                                              getShmemPerfModel()->getElapsedTime(ShmemPerfModel::_USER_THREAD), update_replacement);
          break;
 
       case Core::WRITE:
+         // MYLOG("WRITE: accessCache %lx mem_op_type:%d offset %d: data_length %d m_mem_component:%d",
+         // ca_address, mem_op_type, offset, data_length, m_mem_component);
+
          if(m_mem_component == MemComponent::L3_CACHE)
          {
-            block_write[block_offset]++;
-            // printf("Data length: %d block offset: %d \n", data_length, block_offset);
+            int length = data_length/8 + (data_length%8!=0);
+            for(int i = block_offset; i<block_offset + length; i++)
+            {
+               block_write[i]++;
+               printf("Data length: %d block offset: %d Data length in acessCache: %d \n", write_size, block_offset, data_length);
+            }
+            // printf("Data length: %d block offset: %d Data length in acessCache: %d \n", write_size, block_offset, data_length);
          }
+         if(m_mem_component == MemComponent::L1_DCACHE)
+         {
+            //  printf("Data length: %d block offset: %d Data length in acessCache: %d \n", data_length, block_offset, data_length);
+            int length = data_length/8 + (data_length%8!=0);
+            for(int i = block_offset; i<block_offset + length; i++)
+            {
+               getCacheBlockInfo(ca_address+offset)->dirty_word[i]=1;
+            }
+         }
+         
+
          m_master->m_cache->accessSingleLine(ca_address + offset, Cache::STORE, data_buf, data_length,
                                              getShmemPerfModel()->getElapsedTime(ShmemPerfModel::_USER_THREAD), update_replacement);
          // Write-through cache - Write the next level cache also
@@ -1489,7 +1539,7 @@ CacheCntlr::accessCache(
          {
             LOG_ASSERT_ERROR(m_next_cache_cntlr, "Writethrough enabled on last-level cache !?");
             MYLOG("writethrough start");
-            m_next_cache_cntlr->writeCacheBlock(ca_address, offset, data_buf, data_length, ShmemPerfModel::_USER_THREAD);
+            m_next_cache_cntlr->writeCacheBlock(ca_address, offset, data_buf, data_length, ShmemPerfModel::_USER_THREAD, NULL, 0);
             MYLOG("writethrough done");
          }
          break;
@@ -1569,29 +1619,58 @@ SharedCacheBlockInfo*
 CacheCntlr::insertCacheBlock(IntPtr address, CacheState::cstate_t cstate, Byte* data_buf, core_id_t requester, ShmemPerfModel::Thread_t thread_num) //, IntPtr eip)
 {
 MYLOG("insertCacheBlock l%d @ %lx as %c (now %c)", m_mem_component, address, CStateString(cstate), CStateString(getCacheState(address)));
+// MYLOG("insertCacheBlock data_buf:0)%x %x %x %x %x %x %x %x 1)%x %x %x %x %x %x %x %x 3)%x %x %x %x %x %x %x %x 4) %x %x %x %x %x %x %x %x 5) %x %x %x %x %x %x %x %x 6) %x %x %x %x %x %x %x %x 7) %x %x %x %x %x %x %x %x 8) %x %x %x %x %x %x %x %x 9) %x %x %x %x %x %x %x %x 10) %x %x %x %x %x %x %x %x", data_buf[0],data_buf[1],data_buf[2],data_buf[3],data_buf[4],data_buf[5],data_buf[6],data_buf[7],data_buf[8],data_buf[9],data_buf[10]);
+   
    bool eviction;
    IntPtr evict_address;
    //UInt32 blockIndex; //Removed by Newton
    SharedCacheBlockInfo evict_block_info;
    Byte evict_buf[getCacheBlockSize()];
+   // write_size = 64;
 
    LOG_ASSERT_ERROR(getCacheState(address) == CacheState::INVALID, "we already have this line, can't add it again");
 
-   if (m_mem_component == MemComponent::L3_CACHE)
+if (m_mem_component == MemComponent::L3_CACHE)
    {
         g_NumberOfL3Inserts++;
         SubsecondTime cost = getMemoryManager()->getCost(m_mem_component,
                              CachePerfModel::ACCESS_CACHE_WRITEDATA_AND_TAGS);
         g_costSTTRAM = std::stoi(itostr(cost).c_str());
         g_timeSTTRAM += g_costSTTRAM;
-        if(m_mem_component == MemComponent::L3_CACHE)
-         block_write[block_offset]++;
+      //   block_write[block_offset]++;
+        // printf("Write3 @0x%lx offset:%d \n",
+            //     address, block_offset);
+            // printf("INSERT CACHE BLOCK \n");
+            // printf("Data length: %d block offset: %d  \n", write_size, block_offset);
    }
+
+   
 
    m_master->m_cache->insertSingleLine(address, data_buf,
          &eviction, &evict_address, &evict_block_info, evict_buf,
          getShmemPerfModel()->getElapsedTime(thread_num), this);
    SharedCacheBlockInfo* cache_block_info = setCacheState(address, cstate);
+
+   
+   if(m_mem_component == MemComponent::L2_CACHE)
+   {
+      // printf("In Insert\n");
+      //       for(int i = 0; i<8; i++)
+      //       {
+      //          printf("%d ",evict_block_info.dirty_word[i]);
+      //       }
+      // printf("\n");
+
+   }
+   // if(m_mem_component == MemComponent::L2_CACHE)
+   // {
+   //    // printf("In Insert\n");
+   //          for(int i = 0; i<getCacheBlockSize()/8; i++)
+   //          {
+   //             getCacheBlockInfo(address)->word_write[i]+=m_master->m_prev_cache_cntlrs->
+   //          }
+   // }   
+   
 
    if (m_mem_component == MemComponent::L3_CACHE)
    {
@@ -1712,7 +1791,8 @@ MYLOG("insertCacheBlock l%d local done", m_mem_component);
             {
 
                m_next_cache_cntlr->writeCacheBlock(evict_address, 0, evict_buf,
-                                                   getCacheBlockSize(), thread_num);
+                                                   getCacheBlockSize(), thread_num, &evict_block_info, 1);
+               
 
                if (m_mem_component == MemComponent::L2_CACHE)
                {
@@ -1723,6 +1803,19 @@ MYLOG("insertCacheBlock l%d local done", m_mem_component);
                     * and resulted in eviction of dirty block with address evict_address
                     * from L2 and subsequent writeback in L3. Since, evict_address will
                     * be there in L3 cache, so we are checking for the evict_address in L3 */
+                  //  printf("HERE\n");
+                   for(int i = 0; i<getCacheBlockSize()/8; i++)
+                  {
+                     
+                     // printf("%x ",evict_block_info.dirty_word[i]);
+                     if(evict_block_info.dirty_word[i]==1)
+                     { 
+                        block_write[i]++;
+                     }
+                     // printf("%x ",block_write[i]);
+                  }
+                  // printf("\n");
+                    
                    accountForWriteLatencyOfLLC(evict_address, m_next_cache_cntlr->m_master);
                }
             }
@@ -1890,7 +1983,7 @@ CacheCntlr::updateCacheBlock(IntPtr address, CacheState::cstate_t new_cstate, Tr
             /* write straight into the next level cache */
             Byte data_buf[getCacheBlockSize()];
             retrieveCacheBlock(address, data_buf, thread_num, false);
-            m_next_cache_cntlr->writeCacheBlock(address, 0, data_buf, getCacheBlockSize(), thread_num);
+            m_next_cache_cntlr->writeCacheBlock(address, 0, data_buf, getCacheBlockSize(), thread_num, NULL, 0);
             is_writeback = true;
             sibling_hit = true;
 
@@ -1974,9 +2067,14 @@ CacheCntlr::updateCacheBlock(IntPtr address, CacheState::cstate_t new_cstate, Tr
 }
 
 void
-CacheCntlr::writeCacheBlock(IntPtr address, UInt32 offset, Byte* data_buf, UInt32 data_length, ShmemPerfModel::Thread_t thread_num)
+CacheCntlr::writeCacheBlock(IntPtr address, UInt32 offset, Byte* data_buf, UInt32 data_length, ShmemPerfModel::Thread_t thread_num, CacheBlockInfo *evict_block_info, bool eviction)
 {
-	MYLOG(" ");
+	// MYLOG(" ");
+   // MYLOG("writeCacheBlock address:%lx offset1:%d offset2:%d data_length1:%d data_length2:%d",
+   //       address, offset, g_blockOffset, data_length, g_bytesAccessed);
+
+   // MYLOG("writeCacheBlock data_buf:0)%x %x %x %x %x %x %x %x 1)%x %x %x %x %x %x %x %x 3)%x %x %x %x %x %x %x %x 4) %x %x %x %x %x %x %x %x 5) %x %x %x %x %x %x %x %x 6) %x %x %x %x %x %x %x %x 7) %x %x %x %x %x %x %x %x 8) %x %x %x %x %x %x %x %x 9) %x %x %x %x %x %x %x %x 10) %x %x %x %x %x %x %x %x", data_buf[0],data_buf[1],data_buf[2],data_buf[3],data_buf[4],data_buf[5],data_buf[6],data_buf[7],data_buf[8],data_buf[9],data_buf[10]);
+  
 
    
    ////////////////////L3 writeback taken care off here [ARINDAM]/////////////////////////////////////////////////////////
@@ -2013,21 +2111,47 @@ CacheCntlr::writeCacheBlock(IntPtr address, UInt32 offset, Byte* data_buf, UInt3
    } 
    else 
    {
-      if(m_mem_component == MemComponent::L3_CACHE)
-      {
-         block_write[block_offset]++;
-         // printf("Data length: %d block offset: %d \n", data_length, block_offset);
-      }
+      // if(m_mem_component == MemComponent::L3_CACHE)
+      // {
+      //    block_write[block_offset]++;
+      //    // printf("Write1 @0x%lx offset:%2d g_blockOffset:%2d size:%2d g_bytesAccessed:%2d \n",
+      //          //  address, offset, block_offset, write_size,
+      //          //  data_length);
+      // //   printf("Data length: %d block offset: %d Data length in acessCache: %d \n", write_size, block_offset, data_length);
+      // }
+      // if(m_mem_component == MemComponent::L1_DCACHE)
+      //    {
+      //       //  printf("Data length: %d block offset: %d Data length in acessCache: %d \n", data_length, block_offset, data_length);
+      //       int length = data_length/8 + (data_length%8!=0);
+      //       for(int i = block_offset; i<block_offset + length; i++)
+      //       {
+      //          getCacheBlockInfo(address)->word_write[i]++;
+      //       }
+      //    }
+      
+      
       __attribute__((unused)) SharedCacheBlockInfo* cache_block_info = (SharedCacheBlockInfo*) m_master->m_cache->accessSingleLine(
          address + offset, Cache::STORE, data_buf, data_length, getShmemPerfModel()->getElapsedTime(thread_num), false);
       LOG_ASSERT_ERROR(cache_block_info, "writethrough expected a hit at next-level cache but got miss");
       LOG_ASSERT_ERROR(cache_block_info->getCState() == CacheState::MODIFIED, "Got writeback for non-MODIFIED line");
+      if(eviction)
+      {
+         // printf("in write cache\n");
+         for(int i = 0; i<8; i++)
+         {
+            
+            // printf("%d ",evict_block_info->dirty_word[i]);
+            cache_block_info->dirty_word[i] = evict_block_info->dirty_word[i];
+            // printf("-%d | ",cache_block_info->dirty_word[i]);
+         }
+         // printf("\n");
+      }
    }
 
    if (m_cache_writethrough) 
    {
       acquireStackLock(true);
-      m_next_cache_cntlr->writeCacheBlock(address, offset, data_buf, data_length, thread_num);
+      m_next_cache_cntlr->writeCacheBlock(address, offset, data_buf, data_length, thread_num, NULL, 0);
       releaseStackLock(true);
    }
 }
