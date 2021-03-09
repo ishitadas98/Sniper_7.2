@@ -1521,6 +1521,8 @@ CacheCntlr::accessCache(
             }
             // printf("Data length: %d block offset: %d Data length in acessCache: %d \n", write_size, block_offset, data_length);
          }
+
+         /* dirty_word for the L1 cache words accesed by the core are set*/
          if(m_mem_component == MemComponent::L1_DCACHE)
          {
             //  printf("Data length: %d block offset: %d Data length in acessCache: %d \n", data_length, block_offset, data_length);
@@ -1652,16 +1654,16 @@ if (m_mem_component == MemComponent::L3_CACHE)
    SharedCacheBlockInfo* cache_block_info = setCacheState(address, cstate);
 
    
-   if(m_mem_component == MemComponent::L2_CACHE)
-   {
-      // printf("In Insert\n");
-      //       for(int i = 0; i<8; i++)
-      //       {
-      //          printf("%d ",evict_block_info.dirty_word[i]);
-      //       }
-      // printf("\n");
+   // if(m_mem_component == MemComponent::L2_CACHE)
+   // {
+   //    // printf("In Insert\n");
+   //    //       for(int i = 0; i<8; i++)
+   //    //       {
+   //    //          printf("%d ",evict_block_info.dirty_word[i]);
+   //    //       }
+   //    // printf("\n");
 
-   }
+   // }
    // if(m_mem_component == MemComponent::L2_CACHE)
    // {
    //    // printf("In Insert\n");
@@ -1791,7 +1793,7 @@ MYLOG("insertCacheBlock l%d local done", m_mem_component);
             {
 
                m_next_cache_cntlr->writeCacheBlock(evict_address, 0, evict_buf,
-                                                   getCacheBlockSize(), thread_num, &evict_block_info, 1);
+                                                   getCacheBlockSize(), thread_num, &evict_block_info, 1); // parameters added to copy the cache block info in writecacheblock in case of eviction
                
 
                if (m_mem_component == MemComponent::L2_CACHE)
@@ -1804,6 +1806,7 @@ MYLOG("insertCacheBlock l%d local done", m_mem_component);
                     * from L2 and subsequent writeback in L3. Since, evict_address will
                     * be there in L3 cache, so we are checking for the evict_address in L3 */
                   //  printf("HERE\n");
+                  /* the block evicted from L2 goes to L3 so the block counter for dirty bits is incremented*/
                    for(int i = 0; i<getCacheBlockSize()/8; i++)
                   {
                      
@@ -2141,7 +2144,7 @@ CacheCntlr::writeCacheBlock(IntPtr address, UInt32 offset, Byte* data_buf, UInt3
          {
             
             // printf("%d ",evict_block_info->dirty_word[i]);
-            cache_block_info->dirty_word[i] = evict_block_info->dirty_word[i];
+            cache_block_info->dirty_word[i] = evict_block_info->dirty_word[i]; // copy the cache_block_info in case of eviction
             // printf("-%d | ",cache_block_info->dirty_word[i]);
          }
          // printf("\n");

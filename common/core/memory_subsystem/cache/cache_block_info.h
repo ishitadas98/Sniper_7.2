@@ -17,7 +17,7 @@ class CacheBlockInfo
 
       static const UInt8 BitsUsedOffset = 3;  // Track usage on 1<<BitsUsedOffset granularity (per 64-bit / 8-byte)
       typedef UInt8 BitsUsedType;      // Enough to store one bit per 1<<BitsUsedOffset byte element per cache line (8 8-byte elements for 64-byte cache lines)
-      UInt32 dirty_word[8]={0};
+      UInt32 dirty_word[8]={0}; // Track which words have been written to
 
    // This can be extended later to include other information
    // for different cache coherence protocols
