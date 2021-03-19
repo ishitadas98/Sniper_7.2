@@ -2,9 +2,9 @@
 #include "stdint.h"
 #include "/home/ishita/Desktop/Sniper/sniper-7.2/include/sim_api.h"
 #define ARRAY_SIZE 8
-uint64_t a[ARRAY_SIZE];
-uint64_t b[ARRAY_SIZE];
-uint64_t c[ARRAY_SIZE];
+int a[ARRAY_SIZE];
+int b[ARRAY_SIZE];
+int c[ARRAY_SIZE];
 
 int main()
 {

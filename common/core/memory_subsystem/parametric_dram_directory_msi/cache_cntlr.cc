@@ -1518,6 +1518,7 @@ CacheCntlr::accessCache(
             {
                block_write[i]++;
                printf("Data length: %d block offset: %d Data length in acessCache: %d \n", write_size, block_offset, data_length);
+               getCacheBlockInfo(ca_address+offset)->dirty_word[i]=0;
             }
             // printf("Data length: %d block offset: %d Data length in acessCache: %d \n", write_size, block_offset, data_length);
          }
@@ -1811,10 +1812,10 @@ MYLOG("insertCacheBlock l%d local done", m_mem_component);
                   {
                      
                      // printf("%x ",evict_block_info.dirty_word[i]);
-                     if(evict_block_info.dirty_word[i]==1)
-                     { 
-                        block_write[i]++;
-                     }
+                     // if(evict_block_info.dirty_word[i]==1)
+                     // { 
+                     //    block_write[i]++;
+                     // }
                      // printf("%x ",block_write[i]);
                   }
                   // printf("\n");
@@ -2146,6 +2147,11 @@ CacheCntlr::writeCacheBlock(IntPtr address, UInt32 offset, Byte* data_buf, UInt3
             // printf("%d ",evict_block_info->dirty_word[i]);
             cache_block_info->dirty_word[i] = evict_block_info->dirty_word[i]; // copy the cache_block_info in case of eviction
             // printf("-%d | ",cache_block_info->dirty_word[i]);
+            if(m_mem_component == MemComponent::L3_CACHE)
+            {
+               block_write[i]++;
+               cache_block_info->dirty_word[i]=0;
+            }
          }
          // printf("\n");
       }
