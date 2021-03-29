@@ -114,7 +114,10 @@ Cache::accessSingleLine(IntPtr addr, access_t access_type,
    {
       // printf("Bytes: %d \n", bytes);
       set->write_line(line_index, block_offset, buff, bytes, update_replacement);
-      for(int i=0; i<8; i++)
+      int length = bytes/8 + (bytes%8!=0);
+      for(int i=block_offset; i<(block_offset+length); i++)
+         cache_block_info->dirty_word[i]=1;
+     
       
 
       // NOTE: assumes error occurs in memory. If we want to model bus errors, insert the error into buff instead

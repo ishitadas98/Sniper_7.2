@@ -1526,17 +1526,30 @@ CacheCntlr::accessCache(
          /* dirty_word for the L1 cache words accesed by the core are set*/
          if(m_mem_component == MemComponent::L1_DCACHE)
          {
-            //  printf("Data length: %d block offset: %d Data length in acessCache: %d \n", data_length, block_offset, data_length);
+             printf("ADdress: %d L1 Data length: %d block offset: %d Data length in acessCache: %d \n", ca_address + offset, data_length, block_offset, data_length);
             int length = data_length/8 + (data_length%8!=0);
-            for(int i = block_offset; i<block_offset + length; i++)
-            {
-               getCacheBlockInfo(ca_address+offset)->dirty_word[i]=1;
-            }
+            printf("L1 length: %d  dirty words: \n", length);
+            printf("/////////BEFORE/////////\n");
+            for(int i=0; i<8; i++)
+               printf("%d", getCacheBlockInfo(ca_address+offset)->dirty_word[i]);
+            printf("\n");
+            // for(int i = block_offset; i<block_offset + length; i++)
+            // {
+            //    getCacheBlockInfo(ca_address+offset)->dirty_word[i]=1;
+            //    // printf("%d", getCacheBlockInfo(ca_address+offset)->dirty_word[i]);
+            // }
+            // printf("/////////AFTER/////////\n");
+            // for(int i=0; i<8; i++)
+            //    printf("%d", getCacheBlockInfo(ca_address+offset)->dirty_word[i]);
+            // printf("\n");
          }
          
 
          m_master->m_cache->accessSingleLine(ca_address + offset, Cache::STORE, data_buf, data_length,
                                              getShmemPerfModel()->getElapsedTime(ShmemPerfModel::_USER_THREAD), update_replacement);
+
+         
+         
          // Write-through cache - Write the next level cache also
          if (m_cache_writethrough) 
          {
@@ -1545,6 +1558,15 @@ CacheCntlr::accessCache(
             m_next_cache_cntlr->writeCacheBlock(ca_address, offset, data_buf, data_length, ShmemPerfModel::_USER_THREAD, NULL, 0);
             MYLOG("writethrough done");
          }
+
+         if(m_mem_component == MemComponent::L1_DCACHE)
+         {
+            printf("/////////AFTER/////////\n");
+            for(int i=0; i<8; i++)
+               // printf("%d", getCacheBlockInfo(ca_address+offset)->dirty_word[i]);
+            printf("\n");
+         }
+
          break;
 
       default:
@@ -2103,6 +2125,7 @@ CacheCntlr::writeCacheBlock(IntPtr address, UInt32 offset, Byte* data_buf, UInt3
    }
    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////   
  
+  
    // TODO: should we update access counter?
 
    if (m_master->m_evicting_buf && (address == m_master->m_evicting_address)) 
@@ -2132,6 +2155,11 @@ CacheCntlr::writeCacheBlock(IntPtr address, UInt32 offset, Byte* data_buf, UInt3
       //          getCacheBlockInfo(address)->word_write[i]++;
       //       }
       //    }
+       if(m_mem_component==MemComponent::L1_DCACHE)
+      {
+         printf("IN WRITE CACHE\n");
+         printf("data length: %d, offset: %d\n", data_length, offset);
+      }
       
       
       __attribute__((unused)) SharedCacheBlockInfo* cache_block_info = (SharedCacheBlockInfo*) m_master->m_cache->accessSingleLine(
