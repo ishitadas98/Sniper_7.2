@@ -1526,22 +1526,22 @@ CacheCntlr::accessCache(
          /* dirty_word for the L1 cache words accesed by the core are set*/
          if(m_mem_component == MemComponent::L1_DCACHE)
          {
-             printf("ADdress: %d L1 Data length: %d block offset: %d Data length in acessCache: %d \n", ca_address + offset, data_length, block_offset, data_length);
+             printf("Address: %d L1 Data length: %d block offset: %d Data length in acessCache: %d \n", ca_address + offset, data_length, block_offset, data_length);
             int length = data_length/8 + (data_length%8!=0);
             printf("L1 length: %d  dirty words: \n", length);
             printf("/////////BEFORE/////////\n");
             for(int i=0; i<8; i++)
                printf("%d", getCacheBlockInfo(ca_address+offset)->dirty_word[i]);
             printf("\n");
-            // for(int i = block_offset; i<block_offset + length; i++)
-            // {
-            //    getCacheBlockInfo(ca_address+offset)->dirty_word[i]=1;
-            //    // printf("%d", getCacheBlockInfo(ca_address+offset)->dirty_word[i]);
-            // }
-            // printf("/////////AFTER/////////\n");
-            // for(int i=0; i<8; i++)
-            //    printf("%d", getCacheBlockInfo(ca_address+offset)->dirty_word[i]);
-            // printf("\n");
+            for(int i = block_offset; i<block_offset + length; i++)
+            {
+               getCacheBlockInfo(ca_address+offset)->dirty_word[i]=1;
+               // printf("%d", getCacheBlockInfo(ca_address+offset)->dirty_word[i]);
+            }
+            printf("/////////AFTER/////////\n");
+            for(int i=0; i<8; i++)
+               printf("%d", getCacheBlockInfo(ca_address+offset)->dirty_word[i]);
+            printf("\n");
          }
          
 
@@ -1559,13 +1559,13 @@ CacheCntlr::accessCache(
             MYLOG("writethrough done");
          }
 
-         if(m_mem_component == MemComponent::L1_DCACHE)
-         {
-            printf("/////////AFTER/////////\n");
-            for(int i=0; i<8; i++)
-               // printf("%d", getCacheBlockInfo(ca_address+offset)->dirty_word[i]);
-            printf("\n");
-         }
+         // if(m_mem_component == MemComponent::L1_DCACHE)
+         // {
+         //    printf("/////////AFTER/////////\n");
+         //    for(int i=0; i<8; i++)
+         //       printf("%d", getCacheBlockInfo(ca_address+offset)->dirty_word[i]);
+         //    printf("\n");
+         // }
 
          break;
 
@@ -1646,6 +1646,7 @@ CacheCntlr::insertCacheBlock(IntPtr address, CacheState::cstate_t cstate, Byte* 
 MYLOG("insertCacheBlock l%d @ %lx as %c (now %c)", m_mem_component, address, CStateString(cstate), CStateString(getCacheState(address)));
 // MYLOG("insertCacheBlock data_buf:0)%x %x %x %x %x %x %x %x 1)%x %x %x %x %x %x %x %x 3)%x %x %x %x %x %x %x %x 4) %x %x %x %x %x %x %x %x 5) %x %x %x %x %x %x %x %x 6) %x %x %x %x %x %x %x %x 7) %x %x %x %x %x %x %x %x 8) %x %x %x %x %x %x %x %x 9) %x %x %x %x %x %x %x %x 10) %x %x %x %x %x %x %x %x", data_buf[0],data_buf[1],data_buf[2],data_buf[3],data_buf[4],data_buf[5],data_buf[6],data_buf[7],data_buf[8],data_buf[9],data_buf[10]);
    
+   // printf("in Insert Cache\n");
    bool eviction;
    IntPtr evict_address;
    //UInt32 blockIndex; //Removed by Newton
@@ -1818,7 +1819,15 @@ MYLOG("insertCacheBlock l%d local done", m_mem_component);
                m_next_cache_cntlr->writeCacheBlock(evict_address, 0, evict_buf,
                                                    getCacheBlockSize(), thread_num, &evict_block_info, 1); // parameters added to copy the cache block info in writecacheblock in case of eviction
                
-
+               if(m_mem_component == MemComponent::L2_CACHE)
+               {
+                  printf("Evicted from L1 going to L2 address %d dirty bits: ", evict_address);
+                  for(int i=0; i<8; i++)
+                  {
+                     printf("%d ", evict_block_info.dirty_word[i]);
+                  }
+                  printf("\n");
+               }
                if (m_mem_component == MemComponent::L2_CACHE)
                {
                    /* To count number of writebacks from L2 cache to L3/LLC in a
@@ -2179,6 +2188,7 @@ CacheCntlr::writeCacheBlock(IntPtr address, UInt32 offset, Byte* data_buf, UInt3
             {
                block_write[i]++;
                cache_block_info->dirty_word[i]=0;
+               evict_block_info->dirty_word[i]=0;
             }
          }
          // printf("\n");
