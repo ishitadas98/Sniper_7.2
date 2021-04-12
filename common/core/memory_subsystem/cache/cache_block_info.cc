@@ -30,7 +30,7 @@ CacheBlockInfo::CacheBlockInfo(IntPtr tag, CacheState::cstate_t cstate, UInt64 o
 {
    for(int i = 0; i<8; i++)
    {
-      dirty_word[i]=0;
+      dirty_word[i]=0; // initializing dirty word array
    }
    // printf("dirty bits: ");
    // for(int i=0; i<8; i++)

@@ -1523,7 +1523,8 @@ CacheCntlr::accessCache(
             // printf("Data length: %d block offset: %d Data length in acessCache: %d \n", write_size, block_offset, data_length);
          }
 
-         /* dirty_word for the L1 cache words accesed by the core are set*/
+         /* dirty_word for the L1 cache words accesed by the core are set */
+         /* checking L1 dirty word array elements befre and after setting the writtent words*/
          if(m_mem_component == MemComponent::L1_DCACHE)
          {
              printf("Address: %d L1 Data length: %d block offset: %d Data length in acessCache: %d \n", ca_address + offset, data_length, block_offset, data_length);
@@ -1815,7 +1816,7 @@ MYLOG("insertCacheBlock l%d local done", m_mem_component);
             if (evict_block_info.getCState() == CacheState::MODIFIED)
 	    		//m_next_cache_cntlr->writeCacheBlock(evict_address, 0, evict_buf, getCacheBlockSize(), thread_num);	//this line was removed by Newton and replaced by the follwoing code block
             {
-
+               /* in case of eviction the dirty words set in previous cache line will be passed on to the next level cache */
                m_next_cache_cntlr->writeCacheBlock(evict_address, 0, evict_buf,
                                                    getCacheBlockSize(), thread_num, &evict_block_info, 1); // parameters added to copy the cache block info in writecacheblock in case of eviction
                
@@ -2164,6 +2165,7 @@ CacheCntlr::writeCacheBlock(IntPtr address, UInt32 offset, Byte* data_buf, UInt3
       //          getCacheBlockInfo(address)->word_write[i]++;
       //       }
       //    }
+      /* checking if writecache occurs for L1 */
        if(m_mem_component==MemComponent::L1_DCACHE)
       {
          printf("IN WRITE CACHE\n");
@@ -2175,7 +2177,8 @@ CacheCntlr::writeCacheBlock(IntPtr address, UInt32 offset, Byte* data_buf, UInt3
          address + offset, Cache::STORE, data_buf, data_length, getShmemPerfModel()->getElapsedTime(thread_num), false);
       LOG_ASSERT_ERROR(cache_block_info, "writethrough expected a hit at next-level cache but got miss");
       LOG_ASSERT_ERROR(cache_block_info->getCState() == CacheState::MODIFIED, "Got writeback for non-MODIFIED line");
-      if(eviction)
+      /* in case for eviction the evicted line's dirty words should be set to the next level cache line */
+      if(eviction) 
       {
          // printf("in write cache\n");
          for(int i = 0; i<8; i++)
