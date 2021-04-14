@@ -1,1 +1,1 @@
-../../run-sniper -n 1 -c gainestown_2MB_STTRAM.cfg --roi  ./cacheAccessTest4
+../../run-sniper -n 1 -c gainestown_2MB_STTRAM.cfg --roi  ./cacheAccessTest5

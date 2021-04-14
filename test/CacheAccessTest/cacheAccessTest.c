@@ -1,7 +1,7 @@
 #include "stdio.h"
 #include "stdint.h"
 #include "/home/ishita/Desktop/Sniper/sniper-7.2/include/sim_api.h"
-#define ARRAY_SIZE 800
+#define ARRAY_SIZE 8000
 int a[ARRAY_SIZE];
 int b[ARRAY_SIZE];
 int c[ARRAY_SIZE];

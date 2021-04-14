@@ -1527,7 +1527,7 @@ CacheCntlr::accessCache(
          /* checking L1 dirty word array elements befre and after setting the writtent words*/
          if(m_mem_component == MemComponent::L1_DCACHE)
          {
-             printf("Address: %d L1 Data length: %d block offset: %d Data length in acessCache: %d \n", ca_address + offset, data_length, block_offset, data_length);
+             printf("Address: %x L1 Data length: %d block offset: %d Data length in acessCache: %d \n", ca_address, data_length, block_offset, data_length);
             int length = data_length/8 + (data_length%8!=0);
             printf("L1 length: %d  dirty words: \n", length);
             printf("/////////BEFORE/////////\n");
@@ -1736,6 +1736,8 @@ if (m_mem_component == MemComponent::L3_CACHE)
    if (m_next_cache_cntlr && !m_perfect)
       m_next_cache_cntlr->notifyPrevLevelInsert(m_core_id_master, m_mem_component, address);
 MYLOG("insertCacheBlock l%d local done", m_mem_component);
+
+   printf("eviction: %d \n", eviction);
 
 
    if (eviction)

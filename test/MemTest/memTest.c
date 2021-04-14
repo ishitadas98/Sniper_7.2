@@ -17,8 +17,8 @@ int main()
         c[i] = 0;
     }
     
-    int *p = (int *) 0x614a6c;
-    printf("%x\n", p);
+    // int *p = (int *) 0x614a6c;
+    // printf("%x\n", p);
     printf("address of a[%d] is:0x%x\n", 99, &a[99]);
     
     for (int i = 0; i < ARRAY_SIZE; i++)

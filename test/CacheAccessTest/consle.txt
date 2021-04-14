@@ -1,0 +1,625 @@
+[SNIPER] Start
+========================
+m_writeback_time:0
+m_data_write_time:90225360
+WAYS_TO_SRAM: 0
+========================
+[SNIPER] --------------------------------------------------------------------------------
+[SNIPER] Sniper using SIFT/trace-driven frontend
+[SNIPER] Running pre-ROI region in  CACHE_ONLY mode
+[SNIPER] Running application ROI in DETAILED mode
+[SNIPER] Running post-ROI region in FAST_FORWARD mode
+[SNIPER] --------------------------------------------------------------------------------
+[SNIPER] Enabling performance models
+[SNIPER] Setting instrumentation mode to DETAILED
+ADdress: -701648768 L1 Data length: 4 block offset: 0 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648832 L1 Data length: 4 block offset: 0 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648800 L1 Data length: 4 block offset: 4 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+10000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -1091532072 L1 Data length: 4 block offset: 3 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648764 L1 Data length: 4 block offset: 0 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+10000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648828 L1 Data length: 4 block offset: 0 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+10000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648796 L1 Data length: 4 block offset: 4 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+10001000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -1091532072 L1 Data length: 4 block offset: 3 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648760 L1 Data length: 4 block offset: 1 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+10001000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648824 L1 Data length: 4 block offset: 1 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+10001000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648792 L1 Data length: 4 block offset: 5 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -1091532072 L1 Data length: 4 block offset: 3 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648756 L1 Data length: 4 block offset: 1 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648820 L1 Data length: 4 block offset: 1 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648788 L1 Data length: 4 block offset: 5 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -1091532072 L1 Data length: 4 block offset: 3 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648752 L1 Data length: 4 block offset: 2 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648816 L1 Data length: 4 block offset: 2 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648784 L1 Data length: 4 block offset: 6 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -1091532072 L1 Data length: 4 block offset: 3 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648748 L1 Data length: 4 block offset: 2 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648812 L1 Data length: 4 block offset: 2 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648780 L1 Data length: 4 block offset: 6 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -1091532072 L1 Data length: 4 block offset: 3 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648744 L1 Data length: 4 block offset: 3 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648808 L1 Data length: 4 block offset: 3 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648776 L1 Data length: 4 block offset: 7 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -1091532072 L1 Data length: 4 block offset: 3 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648740 L1 Data length: 4 block offset: 3 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648804 L1 Data length: 4 block offset: 3 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648772 L1 Data length: 4 block offset: 7 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -1091532072 L1 Data length: 4 block offset: 3 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -1091532068 L1 Data length: 4 block offset: 3 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648800 L1 Data length: 4 block offset: 4 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -1091532068 L1 Data length: 4 block offset: 3 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648792 L1 Data length: 4 block offset: 5 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -1091532068 L1 Data length: 4 block offset: 3 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648784 L1 Data length: 4 block offset: 6 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -1091532068 L1 Data length: 4 block offset: 3 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -701648776 L1 Data length: 4 block offset: 7 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -1091532068 L1 Data length: 4 block offset: 3 Data length in acessCache: 4 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -1091532016 L1 Data length: 8 block offset: 2 Data length in acessCache: 8 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -1091532008 L1 Data length: 8 block offset: 3 Data length in acessCache: 8 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -1091532000 L1 Data length: 8 block offset: 4 Data length in acessCache: 8 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -1091531992 L1 Data length: 8 block offset: 5 Data length in acessCache: 8 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+ADdress: -1091531984 L1 Data length: 8 block offset: 6 Data length in acessCache: 8 
+L1 length: 1  dirty words: 
+/////////BEFORE/////////
+00000000
+/////////AFTER/////////
+
+
+
+
+
+
+
+
+[SNIPER] Disabling performance models
+[SNIPER] Leaving ROI after 0.02 seconds
+[SNIPER] Simulated 0.0M instructions, 0.1M cycles, 0.02 IPC
+[SNIPER] Simulation speed 157.2 KIPS (157.2 KIPS / target core - 6361.9ns/instr)
+[SNIPER] Sampling: executed 2.40% of simulated time in detailed mode
+[SNIPER] Setting instrumentation mode to FAST_FORWARD
+[TRACE:0] -- DONE --
+done!
+[('-o', '/tmp/tmpz3rh2c/run_benchmarks'), ('--roi', ''), ('-e', '1'), ('-s', '0'), ('-r', '1'), ('--follow', ''), ('--routine-tracing', '')]
+['./cacheAccessTest3']
+[RECORD-TRACE] Using the Pin frontend (sift/recorder)
+[SNIPER] End
+[SNIPER] Elapsed time: 3.21 seconds
