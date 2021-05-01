@@ -1,9 +1,0 @@
-To compile memTest:
-    gcc -g memTest.c -o memTest
-
-Commands used in perf:
-    
-    sudo perf record -e cpu-clock,faults ./memTest
-    sudo perf report --stdio --sort comm,dso
-    sudo perf report --stdio --dsos=memTest
-    sudo perf annotate --stdio --dsos=memTest --symbol=main

@@ -91,10 +91,7 @@ Cache::accessSingleLine(IntPtr addr, access_t access_type,
    UInt32 line_index = -1;
    UInt32 block_offset;
 
-   
-
    splitAddress(addr, tag, set_index, block_offset);
-   // printf("Offset: %d \n", block_offset);
 
    CacheSet* set = m_sets[set_index];
    CacheBlockInfo* cache_block_info = set->find(tag, &line_index);
@@ -112,13 +109,7 @@ Cache::accessSingleLine(IntPtr addr, access_t access_type,
    }
    else
    {
-      // printf("Bytes: %d \n", bytes);
       set->write_line(line_index, block_offset, buff, bytes, update_replacement);
-      int length = bytes/8 + (bytes%8!=0);
-      for(int i=block_offset; i<(block_offset+length); i++)
-         cache_block_info->dirty_word[i]=1;
-     
-      
 
       // NOTE: assumes error occurs in memory. If we want to model bus errors, insert the error into buff instead
       if (m_fault_injector)
@@ -140,7 +131,6 @@ Cache::insertSingleLine(IntPtr addr, Byte* fill_buff,
 
    CacheBlockInfo* cache_block_info = CacheBlockInfo::create(m_cache_type);
    cache_block_info->setTag(tag);
-   *evict_addr = tagToAddress(evict_block_info->getTag());
 
    m_sets[set_index]->insert(cache_block_info, fill_buff,
          eviction, evict_block_info, evict_buff, cntlr);
@@ -164,6 +154,23 @@ Cache::insertSingleLine(IntPtr addr, Byte* fill_buff,
 
 
 // Single line cache access at addr
+
+CacheBlockInfo*
+Cache::peekSingleLine2(IntPtr addr)
+{
+   IntPtr tag;
+   UInt32 set_index;
+   UInt32 line_index = -1;
+   UInt32 block_offset;
+
+   splitAddress(addr, tag, set_index, block_offset);
+
+   CacheSet* set = m_sets[set_index];
+   CacheBlockInfo* cache_block_info = set->find(tag, &line_index);
+
+   return cache_block_info;
+}
+
 CacheBlockInfo*
 Cache::peekSingleLine(IntPtr addr)
 {

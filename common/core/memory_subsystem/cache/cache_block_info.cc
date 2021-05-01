@@ -28,16 +28,10 @@ CacheBlockInfo::CacheBlockInfo(IntPtr tag, CacheState::cstate_t cstate, UInt64 o
    m_used(0),
    m_options(options)
 {
-   for(int i = 0; i<8; i++)
+   for(int i =0; i<8; i++)
    {
-      dirty_word[i]=0; // initializing dirty word array
+      dirty_word[i]=0;
    }
-   printf("dirty bits: ");
-   for(int i=0; i<8; i++)
-   {
-      printf("%d ", dirty_word[i]);
-   }
-   printf("\n");
 }
 
 CacheBlockInfo::~CacheBlockInfo()

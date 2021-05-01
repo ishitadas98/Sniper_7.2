@@ -17,7 +17,6 @@
 #include "stats.h"
 #include "subsecond_time.h"
 #include "shmem_perf.h"
-#include "cache_perf_model.h"
 
 #include "boost/tuple/tuple.hpp"
 
@@ -294,6 +293,7 @@ namespace ParametricDramDirectoryMSI
 
          // Cache meta-data operations
          SharedCacheBlockInfo* getCacheBlockInfo(IntPtr address);
+         SharedCacheBlockInfo* getCacheBlockInfo2(IntPtr address);
          CacheState::cstate_t getCacheState(IntPtr address);
          CacheState::cstate_t getCacheState(CacheBlockInfo *cache_block_info);
          SharedCacheBlockInfo* setCacheState(IntPtr address, CacheState::cstate_t cstate);
@@ -385,8 +385,7 @@ namespace ParametricDramDirectoryMSI
                IntPtr ca_address, UInt32 offset,
                Byte* data_buf, UInt32 data_length,
                bool modeled,
-               bool count,
-               IntPtr eip);
+               bool count);
          void updateHits(Core::mem_op_t mem_op_type, UInt64 hits);
 
          // Notify next level cache of so it can update its sharing set

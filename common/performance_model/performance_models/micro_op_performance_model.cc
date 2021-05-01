@@ -15,8 +15,6 @@
 #include <cstdio>
 #include <algorithm>
 
-int g_inst_in_roi = 0;
-
 MicroOp* MicroOpPerformanceModel::m_serialize_uop = NULL;
 MicroOp* MicroOpPerformanceModel::m_mfence_uop = NULL;
 MicroOp* MicroOpPerformanceModel::m_memaccess_uop = NULL;
@@ -152,10 +150,6 @@ void MicroOpPerformanceModel::doSquashing(std::vector<DynamicMicroOp*> &current_
    }
 }
 
-// #define PC1 0x11db
-// #define PC2 0x1224
-// #define PC3 0x412af
-
 void MicroOpPerformanceModel::handleInstruction(DynamicInstruction *dynins)
 {
    ComponentPeriod insn_period = *(const_cast<ComponentPeriod*>(static_cast<const ComponentPeriod*>(m_elapsed_time)));
@@ -170,16 +164,6 @@ void MicroOpPerformanceModel::handleInstruction(DynamicInstruction *dynins)
    UInt64 num_reads_done = 0;
    UInt64 num_writes_done = 0;
    UInt64 num_nonmem_done = 0;
-
-   UInt32 pc = dynins->instruction->getAddress();
-   g_inst_in_roi = 0;
-
-   // if ((pc == PC1) || (pc == PC2) || (pc == PC3))
-   // {
-   //     String disAssembly = dynins->instruction->getDisassembly();
-   //     printf("PC:0x%lx %s\n", dynins->instruction->getAddress(), disAssembly.c_str());
-   //     g_inst_in_roi = 1;
-   // }
 
    if (dynins->instruction->getMicroOps())
    {

@@ -59,6 +59,7 @@ class Cache : public CacheBase
             bool* eviction, IntPtr* evict_addr,
             CacheBlockInfo* evict_block_info, Byte* evict_buff, SubsecondTime now, CacheCntlr *cntlr = NULL);
       CacheBlockInfo* peekSingleLine(IntPtr addr);
+      CacheBlockInfo* peekSingleLine2(IntPtr addr);
 
       CacheBlockInfo* peekBlock(UInt32 set_index, UInt32 way) const { return m_sets[set_index]->peekBlock(way); }
 

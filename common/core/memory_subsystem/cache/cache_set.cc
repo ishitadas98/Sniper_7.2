@@ -122,18 +122,7 @@ CacheSet::insert(CacheBlockInfo* cache_block_info, Byte* fill_buff, bool* evicti
    m_cache_block_info_array[index]->clone(cache_block_info);
 
    if (fill_buff != NULL && m_blocks != NULL)
-   {
-      printf("Filling Cache\n");
-      for(int i=0; i<m_blocksize; i++)
-      {
-         if(m_blocks[(index * m_blocksize)+i]!=fill_buff[i])
-         {
-            printf("%d ", i);
-         }
-      }
       memcpy(&m_blocks[index * m_blocksize], (void*) fill_buff, m_blocksize);
-      printf("\n");
-   }
 }
 
 char*

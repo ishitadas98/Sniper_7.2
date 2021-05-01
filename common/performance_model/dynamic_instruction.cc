@@ -45,7 +45,6 @@ void DynamicInstruction::accessMemory(Core *core)
    {
       if (memory_info[idx].executed && memory_info[idx].hit_where == HitWhere::UNKNOWN)
       {
-         // printf("PC:%lx address:%lx\n", instruction->getAddress(), memory_info[idx].addr);
          MemoryResult res = core->accessMemory(
             /*instruction.isAtomic()
                ? (info->type == DynamicInstructionInfo::MEMORY_READ ? Core::LOCK : Core::UNLOCK)

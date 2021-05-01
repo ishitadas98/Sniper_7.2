@@ -19,8 +19,6 @@
 
 #include <cstring>
 
-// extern int g_inst_in_roi;
-
 #if 0
    extern Lock iolock;
 #  define MYLOG(...) { ScopedLock l(iolock); fflush(stderr); fprintf(stderr, "[%8lu] %dcor %-25s@%03u: ", getPerformanceModel()->getCycleCount(ShmemPerfModel::_USER_THREAD), m_core_id, __FUNCTION__, __LINE__); fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n"); fflush(stderr); }
@@ -370,7 +368,7 @@ Core::initiateMemoryAccess(MemComponent::component_t mem_component,
                mem_op_type,
                curr_addr_aligned, curr_offset,
                data_buf ? curr_data_buffer_head : NULL, curr_size,
-               modeled, eip);
+               modeled);
 
       if (hit_where != (HitWhere::where_t)mem_component)
       {
