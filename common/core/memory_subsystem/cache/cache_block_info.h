@@ -61,6 +61,12 @@ class CacheBlockInfo
       bool updateUsage(UInt32 offset, UInt32 size);
       bool updateUsage(BitsUsedType used);
 
+      // void resetDirtyWord(UInt32 i) {resetDirtyBit(i);}
+      void setDirtyBit(UInt32 i);
+      void resetDirtyBit(UInt32 i);
+      void copyDirtyWord(CacheBlockInfo* evict_block_info);
+      UInt8 getDirtyWord();
+
       static const char* getOptionName(option_t option);
 };
 

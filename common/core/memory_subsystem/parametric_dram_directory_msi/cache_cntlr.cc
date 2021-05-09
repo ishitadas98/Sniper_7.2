@@ -1456,7 +1456,7 @@ CacheCntlr::accessCache(
             {
                block_write[i]++;
                printf("Data length: %d block offset: %d Data length in acessCache: %d \n", write_size, block_offset, data_length);
-               //getCacheBlockInfo2(ca_address)->dirty_word[i]=0;
+               getCacheBlockInfo2(ca_address)->resetDirtyBit(i);
             }
             // printf("Data length: %d block offset: %d Data length in acessCache: %d \n", write_size, block_offset, data_length);
          }
@@ -1466,7 +1466,7 @@ CacheCntlr::accessCache(
             int length = data_length/8 + (data_length%8!=0);
             for(int i = block_offset; i<block_offset + length; i++)
             {
-               //getCacheBlockInfo2(ca_address)->dirty_word[i]=1;
+               getCacheBlockInfo2(ca_address)->setDirtyBit(i);
             }
          }
 
@@ -2020,18 +2020,21 @@ CacheCntlr::writeCacheBlock(IntPtr address, UInt32 offset, Byte* data_buf, UInt3
       if(eviction)
       {
          // printf("in write cache\n");
-         #if 0
-         for(int i = 0; i<8; i++)
-         {
+         #if 1
+            cache_block_info->copyDirtyWord(evict_block_info);
             // printf("%d ",evict_block_info->dirty_word[i]);
-            cache_block_info->dirty_word[i] = evict_block_info->dirty_word[i];
+            // cache_block_info->dirty_word[i] = evict_block_info->dirty_word[i];
             // printf("-%d | ",cache_block_info->dirty_word[i]);
             if(m_mem_component == MemComponent::L3_CACHE)
             {
-               block_write[i]++;
-               cache_block_info->dirty_word[i]=0;
+               for(int i = 0; i<8; i++)
+               {
+                  if((cache_block_info->getDirtyWord()>>i)&1)
+                     block_write[i]++;
+                  cache_block_info->resetDirtyBit(i);
+               }
             }
-         }
+         
          #endif
          // printf("\n");
       }
