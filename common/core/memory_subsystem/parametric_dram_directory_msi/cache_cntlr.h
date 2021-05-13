@@ -20,6 +20,9 @@
 
 #include "boost/tuple/tuple.hpp"
 
+#include "string"
+#include "bitset"
+
 class DramCntlrInterface;
 class ATD;
 
@@ -413,6 +416,11 @@ namespace ParametricDramDirectoryMSI
 
          friend class CacheCntlrList;
          friend class MemoryManager;
+
+         void bprint(uint n){
+         std::string s = std::bitset< 8 >(n).to_string(); // string conversion
+         printf("%s\n", s.c_str());
+}
    };
 
 }

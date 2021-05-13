@@ -388,7 +388,7 @@ CacheCntlr::processMemOpFromCore(
    //eip_global_2=eip;
    HitWhere::where_t hit_where = HitWhere::MISS;
 
-   block_offset = offset;
+   block_offset = offset/8;
 
    // Protect against concurrent access from sibling SMT threads
    ScopedLock sl_smt(m_master->m_smt_lock);
@@ -1462,12 +1462,14 @@ CacheCntlr::accessCache(
          }
          if(m_mem_component == MemComponent::L1_DCACHE)
          {
-            //  printf("Data length: %d block offset: %d Data length in acessCache: %d \n", data_length, block_offset, data_length);
+             printf("Cache address: 0x%x block offset: %d Data length in acessCache: %d \n", ca_address, block_offset, data_length);
             int length = data_length/8 + (data_length%8!=0);
+            printf("before: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
             for(int i = block_offset; i<block_offset + length; i++)
             {
                getCacheBlockInfo2(ca_address)->setDirtyBit(i);
             }
+            printf("after: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
          }
 
          m_master->m_cache->accessSingleLine(ca_address + offset, Cache::STORE, data_buf, data_length,
@@ -1623,6 +1625,7 @@ MYLOG("insertCacheBlock l%d local done", m_mem_component);
    if (eviction)
    {
       MYLOG("evicting @%lx", evict_address);
+      
 
       if (
          !m_next_cache_cntlr // Track at LLC
@@ -1698,6 +1701,7 @@ MYLOG("insertCacheBlock l%d local done", m_mem_component);
             if (evict_block_info.getCState() == CacheState::MODIFIED)
 	    		//m_next_cache_cntlr->writeCacheBlock(evict_address, 0, evict_buf, getCacheBlockSize(), thread_num);	//this line was removed by Newton and replaced by the follwoing code block
             {
+
 
                m_next_cache_cntlr->writeCacheBlock(evict_address, 0, evict_buf,
                                                    getCacheBlockSize(), thread_num, &evict_block_info, 1);
