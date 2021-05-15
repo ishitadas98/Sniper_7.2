@@ -151,7 +151,7 @@ CacheBlockInfo::resetDirtyBit(UInt32 i)
 void
 CacheBlockInfo::copyDirtyWord(CacheBlockInfo* evict_block_info)
 {
-   m_dirtyWord = evict_block_info->getDirtyWord();
+   m_dirtyWord = evict_block_info->m_dirtyWord;
 }
 
 UInt8
