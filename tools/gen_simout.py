@@ -61,6 +61,57 @@ def generate_simout(jobid = None, resultsdir = None, partial = None, output = sy
     for c in range(ncores)
   ]
 
+  if 'L1-D.numberOfL3WriteAtOffset-0' in results:
+    results['L1-D.numberOfL3WriteAtOffset-0'] = [float(results['L1-D.numberOfL3WriteAtOffset-0'][core] or 1) for core in range(ncores)]
+
+  if 'L1-D.numberOfL3WriteAtOffset-1 ' in results:
+    results['L1-D.numberOfL3WriteAtOffset-1 '] = [float(results['L1-D.numberOfL3WriteAtOffset-1 '][core] or 1) for core in range(ncores)]
+
+  if 'L1-D.numberOfL3WriteAtOffset-2 ' in results:
+    results['L1-D.numberOfL3WriteAtOffset-2 '] = [float(results['L1-D.numberOfL3WriteAtOffset-2 '][core] or 1) for core in range(ncores)]
+
+  if 'L1-D.numberOfL3WriteAtOffset-3 ' in results:
+    results['L1-D.numberOfL3WriteAtOffset-3 '] = [float(results['L1-D.numberOfL3WriteAtOffset-3 '][core] or 1) for core in range(ncores)]
+
+  if 'L1-D.numberOfL3WriteAtOffset-4 ' in results:
+    results['L1-D.numberOfL3WriteAtOffset-4 '] = [float(results['L1-D.numberOfL3WriteAtOffset-4 '][core] or 1) for core in range(ncores)]
+
+  if 'L1-D.numberOfL3WriteAtOffset-5 ' in results:
+    results['L1-D.numberOfL3WriteAtOffset-5 '] = [float(results['L1-D.numberOfL3WriteAtOffset-5 '][core] or 1) for core in range(ncores)]
+
+  if 'L1-D.numberOfL3WriteAtOffset-6 ' in results:
+    results['L1-D.numberOfL3WriteAtOffset-6 '] = [float(results['L1-D.numberOfL3WriteAtOffset-6 '][core] or 1) for core in range(ncores)]
+
+  if 'L1-D.numberOfL3WriteAtOffset-7 ' in results:
+    results['L1-D.numberOfL3WriteAtOffset-7 '] = [float(results['L1-D.numberOfL3WriteAtOffset-7 '][core] or 1) for core in range(ncores)]
+
+  if 'L1-D.numberOfL3ReadAtOffset-0' in results:
+    results['L1-D.numberOfL3ReadAtOffset-0'] = [float(results['L1-D.numberOfL3ReadAtOffset-0'][core] or 1) for core in range(ncores)]
+
+  if 'L1-D.numberOfL3ReadAtOffset-1' in results:
+    results['L1-D.numberOfL3ReadAtOffset-1'] = [float(results['L1-D.numberOfL3ReadAtOffset-1'][core] or 1) for core in range(ncores)]
+
+  if 'L1-D.numberOfL3ReadAtOffset-2' in results:
+    results['L1-D.numberOfL3ReadAtOffset-2'] = [float(results['L1-D.numberOfL3ReadAtOffset-2'][core] or 1) for core in range(ncores)]
+
+  if 'L1-D.numberOfL3ReadAtOffset-3' in results:
+    results['L1-D.numberOfL3ReadAtOffset-3'] = [float(results['L1-D.numberOfL3ReadAtOffset-3'][core] or 1) for core in range(ncores)]
+
+  if 'L1-D.numberOfL3ReadAtOffset-4' in results:
+    results['L1-D.numberOfL3ReadAtOffset-4'] = [float(results['L1-D.numberOfL3ReadAtOffset-4'][core] or 1) for core in range(ncores)]
+
+  if 'L1-D.numberOfL3ReadAtOffset-5' in results:
+    results['L1-D.numberOfL3ReadAtOffset-5'] = [float(results['L1-D.numberOfL3ReadAtOffset-5'][core] or 1) for core in range(ncores)]
+
+  if 'L1-D.numberOfL3ReadAtOffset-6' in results:
+    results['L1-D.numberOfL3ReadAtOffset-6'] = [float(results['L1-D.numberOfL3ReadAtOffset-6'][core] or 1) for core in range(ncores)]
+
+  if 'L1-D.numberOfL3ReadAtOffset-7' in results:
+    results['L1-D.numberOfL3ReadAtOffset-7'] = [float(results['L1-D.numberOfL3ReadAtOffset-7'][core] or 1) for core in range(ncores)]
+
+
+
+
   template = [
     ('  Instructions', 'performance_model.instruction_count', str),
     ('  Cycles',       'performance_model.cycle_count_fixed', format_int),
@@ -68,6 +119,22 @@ def generate_simout(jobid = None, resultsdir = None, partial = None, output = sy
     ('  Time (ns)',    'performance_model.elapsed_time_fixed', format_ns(0)),
     ('  Idle time (ns)', 'performance_model.idle_elapsed_time', format_ns(0)),
     ('  Idle time (%)',  'performance_model.idle_elapsed_percent', format_pct),
+    ('  Number of Writes in Block 1',  'L1-D.numberOfL3WriteAtOffset-0', format_int),
+    ('  Number of Writes in Block 2',  'L1-D.numberOfL3WriteAtOffset-1', format_int),
+    ('  Number of Writes in Block 3',  'L1-D.numberOfL3WriteAtOffset-2', format_int),
+    ('  Number of Writes in Block 4',  'L1-D.numberOfL3WriteAtOffset-3', format_int),
+    ('  Number of Writes in Block 5',  'L1-D.numberOfL3WriteAtOffset-4', format_int),
+    ('  Number of Writes in Block 6',  'L1-D.numberOfL3WriteAtOffset-5', format_int),
+    ('  Number of Writes in Block 7',  'L1-D.numberOfL3WriteAtOffset-6', format_int),
+    ('  Number of Writes in Block 8',  'L1-D.numberOfL3WriteAtOffset-7', format_int),
+    ('  Number of Reads in Block 1',  'L1-D.numberOfL3ReadAtOffset-0', format_int),
+    ('  Number of Reads in Block 2',  'L1-D.numberOfL3ReadAtOffset-1', format_int),
+    ('  Number of Reads in Block 3',  'L1-D.numberOfL3ReadAtOffset-2', format_int),
+    ('  Number of Reads in Block 4',  'L1-D.numberOfL3ReadAtOffset-3', format_int),
+    ('  Number of Reads in Block 5',  'L1-D.numberOfL3ReadAtOffset-4', format_int),
+    ('  Number of Reads in Block 6',  'L1-D.numberOfL3ReadAtOffset-5', format_int),
+    ('  Number of Reads in Block 7',  'L1-D.numberOfL3ReadAtOffset-6', format_int),
+    ('  Number of Reads in Block 8',  'L1-D.numberOfL3ReadAtOffset-7', format_int),
   ]
 
   if 'branch_predictor.num-incorrect' in results:

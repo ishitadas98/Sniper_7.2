@@ -1462,14 +1462,14 @@ CacheCntlr::accessCache(
          }
          if(m_mem_component == MemComponent::L1_DCACHE)
          {
-             printf("Cache address: 0x%x block offset: %d Data length in acessCache: %d \n", ca_address, block_offset, data_length);
+            //  printf("Cache address: 0x%x block offset: %d Data length in acessCache: %d \n", ca_address, block_offset, data_length);
             int length = data_length/8 + (data_length%8!=0);
-            printf("before: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
+            // printf("before: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
             for(int i = block_offset; i<block_offset + length; i++)
             {
                getCacheBlockInfo2(ca_address)->setDirtyBit(i);
             }
-            printf("after: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
+            // printf("after: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
          }
 
          m_master->m_cache->accessSingleLine(ca_address + offset, Cache::STORE, data_buf, data_length,
