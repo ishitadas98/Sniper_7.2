@@ -10,7 +10,7 @@ int main()
 {
     SimRoiStart();
     SimNamedMarker(4, "begin");
-    for (int i = 0; i < ARRAY_SIZE; i+=2)
+    for (int i = 0; i < ARRAY_SIZE; i+=4)
     {
         a[i] = i;
         b[i] = i*5;
