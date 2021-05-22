@@ -28,6 +28,7 @@ class CacheBlockInfo
       BitsUsedType m_used;
       UInt8 m_options;  // large enough to hold a bitfield for all available option_t's
       UInt8 m_dirtyWord;
+      UInt8 m_readWord;
 
       static const char* option_names[];
 

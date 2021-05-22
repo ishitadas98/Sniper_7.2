@@ -165,6 +165,11 @@ void MicroOpPerformanceModel::handleInstruction(DynamicInstruction *dynins)
    UInt64 num_writes_done = 0;
    UInt64 num_nonmem_done = 0;
 
+   UInt32 pc = dynins->instruction->getAddress();
+
+   String disAssembly = dynins->instruction->getDisassembly();
+   printf("0x:%lx %s\n", dynins->instruction->getAddress(), disAssembly.c_str());
+
    if (dynins->instruction->getMicroOps())
    {
       for(std::vector<const MicroOp*>::const_iterator it = dynins->instruction->getMicroOps()->begin(); it != dynins->instruction->getMicroOps()->end(); it++)
