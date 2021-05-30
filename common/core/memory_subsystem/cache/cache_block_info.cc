@@ -27,7 +27,8 @@ CacheBlockInfo::CacheBlockInfo(IntPtr tag, CacheState::cstate_t cstate, UInt64 o
    m_owner(0),
    m_used(0),
    m_options(options),
-   m_dirtyWord(0)
+   m_dirtyWord(0),
+   m_readWord(0)
 {
 }
 
@@ -72,6 +73,7 @@ CacheBlockInfo::clone(CacheBlockInfo* cache_block_info)
    m_used = cache_block_info->m_used;
    m_options = cache_block_info->m_options;
    m_dirtyWord = cache_block_info->m_dirtyWord;
+   m_readWord = cache_block_info->m_readWord;
    
    //dirty_word = new UInt32[8];
    //for(int i =0; i<8; i++)
@@ -124,6 +126,31 @@ CacheBlockInfo::setDirtyBit(UInt32 i)
 }
 
 void
+CacheBlockInfo::setReadBit(UInt32 i)
+{
+   switch(i)
+   {
+      case 0: m_readWord = m_readWord | 0b00000001;
+               break;
+      case 1: m_readWord = m_readWord | 0b00000010;
+               break;
+      case 2: m_readWord = m_readWord | 0b00000100;
+               break;
+      case 3: m_readWord = m_readWord | 0b00001000;
+               break;
+      case 4: m_readWord = m_readWord | 0b00010000;
+               break;
+      case 5: m_readWord = m_readWord | 0b00100000;
+               break;
+      case 6: m_readWord = m_readWord | 0b01000000;
+               break;
+      case 7: m_readWord = m_readWord | 0b10000000;
+               break;
+      default: m_readWord = 0;
+   }
+}
+
+void
 CacheBlockInfo::resetDirtyBit(UInt32 i)
 {
    switch(i)
@@ -149,13 +176,50 @@ CacheBlockInfo::resetDirtyBit(UInt32 i)
 }
 
 void
+CacheBlockInfo::resetReadBit(UInt32 i)
+{
+   switch(i)
+   {
+      case 0: m_readWord = m_readWord & 0b11111110;
+               break;
+      case 1: m_readWord = m_readWord & 0b11111101;
+               break;
+      case 2: m_readWord = m_readWord & 0b11111011;
+               break;
+      case 3: m_readWord = m_readWord & 0b11110111;
+               break;
+      case 4: m_readWord = m_readWord & 0b11101111;
+               break;
+      case 5: m_readWord = m_readWord & 0b11011111;
+               break;
+      case 6: m_readWord = m_readWord & 0b10111111;
+               break;
+      case 7: m_readWord = m_readWord & 0b01111111;
+               break;
+      default: m_readWord = 0;
+   } 
+}
+
+void
 CacheBlockInfo::copyDirtyWord(CacheBlockInfo* evict_block_info)
 {
    m_dirtyWord = evict_block_info->m_dirtyWord;
+}
+
+void
+CacheBlockInfo::copyReadWord(CacheBlockInfo* evict_block_info)
+{
+   m_readWord = evict_block_info->m_readWord;
 }
 
 UInt8
 CacheBlockInfo::getDirtyWord()
 {
    return m_dirtyWord;
+}
+
+UInt8
+CacheBlockInfo::getReadWord()
+{
+   return m_readWord;
 }

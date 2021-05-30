@@ -1442,6 +1442,43 @@ CacheCntlr::accessCache(
    {
       case Core::READ:
       case Core::READ_EX:
+
+
+         if(m_mem_component == MemComponent::L3_CACHE)
+         {
+                        // printf("Data length: %d block offset: %d \n", data_length, block_offset);
+            int length = data_length/8 + (data_length%8!=0);
+            for(int i = block_offset; i<block_offset + length; i++)
+            {
+               block_read[i]++;
+               // printf("Data length: %d block offset: %d Data length in acessCache: %d \n", write_size, block_offset, data_length);
+               getCacheBlockInfo2(ca_address)->resetReadBit(i);
+            }
+            // printf("Data length: %d block offset: %d Data length in acessCache: %d \n", write_size, block_offset, data_length);
+         }
+         if(m_mem_component == MemComponent::L1_DCACHE)
+         {
+            //  printf("Cache address: 0x%x block offset: %d Data length in acessCache: %d \n", ca_address, block_offset, data_length);
+            int length = data_length/8 + (data_length%8!=0);
+            // printf("before: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
+            for(int i = block_offset; i<block_offset + length; i++)
+            {
+               getCacheBlockInfo2(ca_address)->setReadBit(i);
+            }
+            // printf("after: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
+         }
+          if(m_mem_component == MemComponent::L2_CACHE)
+         {
+            //  printf("Cache address: 0x%x block offset: %d Data length in acessCache: %d \n", ca_address, block_offset, data_length);
+            int length = data_length/8 + (data_length%8!=0);
+            // printf("before: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
+            for(int i = block_offset; i<block_offset + length; i++)
+            {
+               getCacheBlockInfo2(ca_address)->setReadBit(i);
+            }
+            // printf("after: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
+         }
+
          m_master->m_cache->accessSingleLine(ca_address + offset, Cache::LOAD, data_buf, data_length,
                                              getShmemPerfModel()->getElapsedTime(ShmemPerfModel::_USER_THREAD), update_replacement);
          break;
@@ -2037,6 +2074,7 @@ CacheCntlr::writeCacheBlock(IntPtr address, UInt32 offset, Byte* data_buf, UInt3
          // printf("in write cache\n");
          #if 1
             cache_block_info->copyDirtyWord(evict_block_info);
+            cache_block_info->copyReadWord(evict_block_info);
             // printf("%d ",evict_block_info->dirty_word[i]);
             // cache_block_info->dirty_word[i] = evict_block_info->dirty_word[i];
             // printf("-%d | ",cache_block_info->dirty_word[i]);
@@ -2047,6 +2085,12 @@ CacheCntlr::writeCacheBlock(IntPtr address, UInt32 offset, Byte* data_buf, UInt3
                   if((cache_block_info->getDirtyWord()>>i)&1)
                      block_write[i]++;
                   cache_block_info->resetDirtyBit(i);
+               }
+               for(int i = 0; i<8; i++)
+               {
+                  if((cache_block_info->getReadWord()>>i)&1)
+                     block_read[i]++;
+                  cache_block_info->resetReadBit(i);
                }
             }
          

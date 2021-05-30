@@ -64,9 +64,13 @@ class CacheBlockInfo
 
       // void resetDirtyWord(UInt32 i) {resetDirtyBit(i);}
       void setDirtyBit(UInt32 i);
+      void setReadBit(UInt32 i);
       void resetDirtyBit(UInt32 i);
+      void resetReadBit(UInt32 i);
       void copyDirtyWord(CacheBlockInfo* evict_block_info);
+      void copyReadWord(CacheBlockInfo* evict_block_info);
       UInt8 getDirtyWord();
+      UInt8 getReadWord();
 
       static const char* getOptionName(option_t option);
 };
