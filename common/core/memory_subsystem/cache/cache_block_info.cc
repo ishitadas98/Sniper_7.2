@@ -121,7 +121,7 @@ CacheBlockInfo::setDirtyBit(UInt32 i)
                break;
       case 7: m_dirtyWord = m_dirtyWord | 0b10000000;
                break;
-      default: m_dirtyWord = 0;
+      default: assert(0);
    }
 }
 
@@ -146,7 +146,7 @@ CacheBlockInfo::setReadBit(UInt32 i)
                break;
       case 7: m_readWord = m_readWord | 0b10000000;
                break;
-      default: m_readWord = 0;
+      default: assert(0);
    }
 }
 
@@ -171,7 +171,7 @@ CacheBlockInfo::resetDirtyBit(UInt32 i)
                break;
       case 7: m_dirtyWord = m_dirtyWord & 0b01111111;
                break;
-      default: m_dirtyWord = 0;
+      default: assert(0);
    } 
 }
 
@@ -196,7 +196,7 @@ CacheBlockInfo::resetReadBit(UInt32 i)
                break;
       case 7: m_readWord = m_readWord & 0b01111111;
                break;
-      default: m_readWord = 0;
+      default:assert(0);
    } 
 }
 

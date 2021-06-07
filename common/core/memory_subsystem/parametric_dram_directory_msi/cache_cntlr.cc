@@ -1438,24 +1438,25 @@ CacheCntlr::accessCache(
       Core::mem_op_t mem_op_type, IntPtr ca_address, UInt32 offset,
       Byte* data_buf, UInt32 data_length, bool update_replacement)
 {
+   block_offset = offset/8;
    switch (mem_op_type)
    {
       case Core::READ:
       case Core::READ_EX:
 
 
-         if(m_mem_component == MemComponent::L3_CACHE)
-         {
-                        // printf("Data length: %d block offset: %d \n", data_length, block_offset);
-            int length = data_length/8 + (data_length%8!=0);
-            for(int i = block_offset; i<block_offset + length; i++)
-            {
-               block_read[i]++;
-               // printf("Data length: %d block offset: %d Data length in acessCache: %d \n", write_size, block_offset, data_length);
-               getCacheBlockInfo2(ca_address)->resetReadBit(i);
-            }
-            // printf("Data length: %d block offset: %d Data length in acessCache: %d \n", write_size, block_offset, data_length);
-         }
+         // if(m_mem_component == MemComponent::L3_CACHE)
+         // {
+         //                // printf("Data length: %d block offset: %d \n", data_length, block_offset);
+         //    int length = data_length/8 + (data_length%8!=0);
+         //    for(int i = block_offset; i<block_offset + length; i++)
+         //    {
+         //       block_read[i]++;
+         //       // printf("Data length: %d block offset: %d Data length in acessCache: %d \n", write_size, block_offset, data_length);
+         //       getCacheBlockInfo2(ca_address)->resetReadBit(i);
+         //    }
+         //    // printf("Data length: %d block offset: %d Data length in acessCache: %d \n", write_size, block_offset, data_length);
+         // }
          if(m_mem_component == MemComponent::L1_DCACHE)
          {
             //  printf("Cache address: 0x%x block offset: %d Data length in acessCache: %d \n", ca_address, block_offset, data_length);
@@ -1467,17 +1468,17 @@ CacheCntlr::accessCache(
             }
             // printf("after: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
          }
-          if(m_mem_component == MemComponent::L2_CACHE)
-         {
-            //  printf("Cache address: 0x%x block offset: %d Data length in acessCache: %d \n", ca_address, block_offset, data_length);
-            int length = data_length/8 + (data_length%8!=0);
-            // printf("before: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
-            for(int i = block_offset; i<block_offset + length; i++)
-            {
-               getCacheBlockInfo2(ca_address)->setReadBit(i);
-            }
-            // printf("after: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
-         }
+         //  if(m_mem_component == MemComponent::L2_CACHE)
+         // {
+         //    //  printf("Cache address: 0x%x block offset: %d Data length in acessCache: %d \n", ca_address, block_offset, data_length);
+         //    int length = data_length/8 + (data_length%8!=0);
+         //    // printf("before: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
+         //    for(int i = block_offset; i<block_offset + length; i++)
+         //    {
+         //       getCacheBlockInfo2(ca_address)->setReadBit(i);
+         //    }
+         //    // printf("after: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
+         // }
 
          m_master->m_cache->accessSingleLine(ca_address + offset, Cache::LOAD, data_buf, data_length,
                                              getShmemPerfModel()->getElapsedTime(ShmemPerfModel::_USER_THREAD), update_replacement);
@@ -1485,18 +1486,18 @@ CacheCntlr::accessCache(
 
       case Core::WRITE:
 
-         if(m_mem_component == MemComponent::L3_CACHE)
-         {
-                        // printf("Data length: %d block offset: %d \n", data_length, block_offset);
-            int length = data_length/8 + (data_length%8!=0);
-            for(int i = block_offset; i<block_offset + length; i++)
-            {
-               block_write[i]++;
-               // printf("Data length: %d block offset: %d Data length in acessCache: %d \n", write_size, block_offset, data_length);
-               getCacheBlockInfo2(ca_address)->resetDirtyBit(i);
-            }
-            // printf("Data length: %d block offset: %d Data length in acessCache: %d \n", write_size, block_offset, data_length);
-         }
+         // if(m_mem_component == MemComponent::L3_CACHE)
+         // {
+         //                // printf("Data length: %d block offset: %d \n", data_length, block_offset);
+         //    int length = data_length/8 + (data_length%8!=0);
+         //    for(int i = block_offset; i<block_offset + length; i++)
+         //    {
+         //       block_write[i]++;
+         //       // printf("Data length: %d block offset: %d Data length in acessCache: %d \n", write_size, block_offset, data_length);
+         //       getCacheBlockInfo2(ca_address)->resetDirtyBit(i);
+         //    }
+         //    // printf("Data length: %d block offset: %d Data length in acessCache: %d \n", write_size, block_offset, data_length);
+         // }
          if(m_mem_component == MemComponent::L1_DCACHE)
          {
             //  printf("Cache address: 0x%x block offset: %d Data length in acessCache: %d \n", ca_address, block_offset, data_length);
@@ -1508,17 +1509,17 @@ CacheCntlr::accessCache(
             }
             // printf("after: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
          }
-          if(m_mem_component == MemComponent::L2_CACHE)
-         {
-            //  printf("Cache address: 0x%x block offset: %d Data length in acessCache: %d \n", ca_address, block_offset, data_length);
-            int length = data_length/8 + (data_length%8!=0);
-            // printf("before: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
-            for(int i = block_offset; i<block_offset + length; i++)
-            {
-               getCacheBlockInfo2(ca_address)->setDirtyBit(i);
-            }
-            // printf("after: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
-         }
+         //  if(m_mem_component == MemComponent::L2_CACHE)
+         // {
+         //    //  printf("Cache address: 0x%x block offset: %d Data length in acessCache: %d \n", ca_address, block_offset, data_length);
+         //    int length = data_length/8 + (data_length%8!=0);
+         //    // printf("before: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
+         //    for(int i = block_offset; i<block_offset + length; i++)
+         //    {
+         //       getCacheBlockInfo2(ca_address)->setDirtyBit(i);
+         //    }
+         //    // printf("after: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
+         // }
 
          m_master->m_cache->accessSingleLine(ca_address + offset, Cache::STORE, data_buf, data_length,
                                              getShmemPerfModel()->getElapsedTime(ShmemPerfModel::_USER_THREAD), update_replacement);

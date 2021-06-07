@@ -178,6 +178,8 @@ def generate_simout(jobid = None, resultsdir = None, partial = None, output = sy
     results['%s.mpki'%c] = map(lambda (a,b): 1000*a/float(b) if b else float('inf'), zip(results['%s.misses'%c], results['performance_model.instruction_count']))
     template.extend([
       ('  Cache %s'%c, '', ''),
+      ('    num cache loads', '%s.loads'%c, str),
+      ('    num cache stores', '%s.stores'%c, str),
       ('    num cache accesses', '%s.accesses'%c, str),
       ('    num cache misses', '%s.misses'%c, str),
       ('    miss rate', '%s.missrate'%c, lambda v: '%.2f%%' % v),

@@ -168,7 +168,7 @@ void MicroOpPerformanceModel::handleInstruction(DynamicInstruction *dynins)
    UInt32 pc = dynins->instruction->getAddress();
 
    String disAssembly = dynins->instruction->getDisassembly();
-   printf("0x:%lx %s\n", dynins->instruction->getAddress(), disAssembly.c_str());
+   // printf("0x:%lx %s\n", dynins->instruction->getAddress(), disAssembly.c_str());
 
    if (dynins->instruction->getMicroOps())
    {
