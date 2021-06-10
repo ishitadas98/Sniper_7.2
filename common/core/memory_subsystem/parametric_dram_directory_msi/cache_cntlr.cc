@@ -10,7 +10,13 @@
 #include "cache_atd.h"
 #include "shmem_perf.h"
 
+
 #include <cstring>
+#include <iostream>
+#include <iterator>
+#include <map>
+
+using namespace std;
 
 //IntPtr eip_global;
 //IntPtr eip_global_2;
@@ -39,8 +45,9 @@ static UInt64 g_NumberL2WritebacksToL3;
 //#define WAYS_TO_SRAM    4
 #define WAYS_TO_SRAM    16
 
-static UInt64 block_write[8] = {0};
-static UInt64 block_read[8] = {0};
+static UInt64 block_write[9] = {0};
+static UInt64 block_read[9] = {0};
+static map<IntPtr, UInt64[8]> writes;
 UInt32 block_offset;
 UInt32 write_size;
 
@@ -195,6 +202,8 @@ CacheCntlr::CacheCntlr(MemComponent::component_t mem_component,
        printf("m_data_write_time:%s\n", itostr(m_data_write_time.getLatency()).c_str());
        printf("========================\n");
    }
+   
+   
 
    m_core_id_master = m_core_id - m_core_id % m_shared_cores;
    Sim()->getStatsManager()->logTopology(name, core_id, m_core_id_master);
@@ -261,11 +270,28 @@ CacheCntlr::CacheCntlr(MemComponent::component_t mem_component,
 
    registerStatsMetric(name, core_id, "timeSTTRAM", &g_timeSTTRAM);
 
-   for(UInt32 i = 0; i < 8; ++i)
+   for(UInt32 i = 0; i < 9; ++i)
    {
       registerStatsMetric(name, core_id, String("numberOfL3WriteAtOffset-")+itostr(i), &block_write[i]);
       registerStatsMetric(name, core_id, String("numberOfL3ReadAtOffset-")+itostr(i), &block_read[i]);
    }
+
+   // printf("size = %d \n", writes.size());
+   // for(auto it = writes.begin(); it != writes.end(); ++it)
+   //    printf("%s \n", it->first);
+
+   // map<IntPtr, UInt64[8]> :: iterator itr;
+   // UInt32 num=0;
+   // for(auto itr = writes.begin(); itr != writes.end(); ++itr)
+   // {
+   //    num++;
+   //    printf("%d \n", num);
+   //    for(UInt32 i = 0; i < 8; ++i)
+   //    {
+   //       UInt64 val = writes[itr->first][i];
+   //       registerStatsMetric(name, core_id, String("Word")+itostr(i)+String("of")+ itostr(itr->first), &val);
+   //    }
+   // }
 
    registerStatsMetric(name, core_id, "loads", &stats.loads);
    registerStatsMetric(name, core_id, "stores", &stats.stores);
@@ -388,6 +414,7 @@ CacheCntlr::processMemOpFromCore(
    //eip_global_2=eip;
    HitWhere::where_t hit_where = HitWhere::MISS;
 
+   writes[14677][6]=64564;
    block_offset = offset/8;
 
    // Protect against concurrent access from sibling SMT threads
@@ -668,6 +695,18 @@ MYLOG("access done");
       Sim()->getConfig()->getCacheEfficiencyCallbacks().call_notify_access(cache_block_info->getOwner(), mem_op_type, hit_where);
 
    MYLOG("returning %s, latency %lu ns", HitWhereString(hit_where), total_latency.getNS());
+
+   map<IntPtr, UInt64[8]> :: iterator itr;
+   for(itr = writes.begin(); itr != writes.end(); ++itr)
+   {
+      printf("%d \n", itr->first);
+      for(int i = 0; i<8; i++)
+      {
+         printf("%d ", itr->second);
+      }
+      printf("\n");
+   }
+
    return hit_where;
 }
 
@@ -1500,12 +1539,14 @@ CacheCntlr::accessCache(
          // }
          if(m_mem_component == MemComponent::L1_DCACHE)
          {
-            //  printf("Cache address: 0x%x block offset: %d Data length in acessCache: %d \n", ca_address, block_offset, data_length);
+            // printf("Cache address: 0x%x block offset: %d Data length in acessCache: %d \n", ca_address, block_offset, data_length);
             int length = data_length/8 + (data_length%8!=0);
             // printf("before: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
             for(int i = block_offset; i<block_offset + length; i++)
             {
                getCacheBlockInfo2(ca_address)->setDirtyBit(i);
+               // block_write[i]++;
+               // printf("%d: %d\n", i+1, block_write[i]);
             }
             // printf("after: %d\n", getCacheBlockInfo2(ca_address)->getDirtyWord());
          }
@@ -1627,10 +1668,31 @@ MYLOG("insertCacheBlock l%d @ %lx as %c (now %c)", m_mem_component, address, CSt
         g_timeSTTRAM += g_costSTTRAM;
    }
 
+   
+
    m_master->m_cache->insertSingleLine(address, data_buf,
          &eviction, &evict_address, &evict_block_info, evict_buf,
          getShmemPerfModel()->getElapsedTime(thread_num), this);
    SharedCacheBlockInfo* cache_block_info = setCacheState(address, cstate);
+
+   // if(eviction)
+   // {
+   //    if(m_mem_component == MemComponent::L1_DCACHE)
+   //          {
+   //             for(int i = 0; i<8; i++)
+   //             {
+   //                if((evict_block_info.getDirtyWord()>>i)&1)
+   //                   block_write[i]++;
+   //                // cache_block_info->resetDirtyBit(i);
+   //             }
+   //             for(int i = 0; i<8; i++)
+   //             {
+   //                if((evict_block_info.getReadWord()>>i)&1)
+   //                   block_read[i]++;
+   //                // cache_block_info->resetReadBit(i);
+   //             }
+   //          }
+   // }
 
    if (m_mem_component == MemComponent::L3_CACHE)
    {
@@ -2079,20 +2141,59 @@ CacheCntlr::writeCacheBlock(IntPtr address, UInt32 offset, Byte* data_buf, UInt3
             // printf("%d ",evict_block_info->dirty_word[i]);
             // cache_block_info->dirty_word[i] = evict_block_info->dirty_word[i];
             // printf("-%d | ",cache_block_info->dirty_word[i]);
+            int wcount = 0;
+            int rcount = 0;
             if(m_mem_component == MemComponent::L3_CACHE)
             {
+               // map<IntPtr, int[8]> ::iterator itr;
+               // bool flag = 0;
+               // for(itr = writes.begin(); itr != writes.end(); ++itr)
+               // {
+               //    if (itr->first == address)
+               //    {
+               //       flag = 1;
+               //       break;
+               //    }
+               // }
+               // if(flag)
+               // {
+               // printf("%d \n", address);
+               printf("size in func = %d \n", writes.size());
                for(int i = 0; i<8; i++)
                {
                   if((cache_block_info->getDirtyWord()>>i)&1)
-                     block_write[i]++;
+                  {
+                     writes[address][i]++;
+                     // printf("%d \n", writes[address][i]++);
+                  }
+               }
+               // }
+               // else
+               // {
+               //    int w[8] = {0};
+               //    for(int i = 0; i<8; i++)
+               //    {
+               //       if((cache_block_info->getDirtyWord()>>i)&1)
+               //          w[i] = 1;
+               //    }
+               //    writes.insert(make_pair(address, w));
+               // }
+               for(int i = 0; i<8; i++)
+               {
+                  if((cache_block_info->getDirtyWord()>>i)&1)
+                     wcount++;
+                     // block_write[i]++;
                   cache_block_info->resetDirtyBit(i);
                }
+               block_write[wcount]++;
                for(int i = 0; i<8; i++)
                {
                   if((cache_block_info->getReadWord()>>i)&1)
-                     block_read[i]++;
+                  rcount++;
+                     // block_read[i]++;
                   cache_block_info->resetReadBit(i);
                }
+               block_read[rcount]++;
             }
          
          #endif

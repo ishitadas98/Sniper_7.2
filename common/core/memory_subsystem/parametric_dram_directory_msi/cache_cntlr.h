@@ -1,5 +1,8 @@
 #pragma once
 
+#include <iostream>
+#include <iterator>
+#include <map>
 #include "core.h"
 #include "cache.h"
 #include "prefetcher.h"
